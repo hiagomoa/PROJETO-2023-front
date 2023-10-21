@@ -38,7 +38,7 @@ const InputBase = (
           </InputLeftAddon>
         )}
         {leftElement && <InputLeftElement>{leftElement}</InputLeftElement>}
-        <Input type="date" ref={ref} {...rest} placeholder={placeholder} />
+        <Input type="datetime-local" ref={ref} {...rest} placeholder={placeholder} />
         {rightAddon && (
           <InputRightAddon p={3} borderLeft="none" bg="none">
             {rightAddon}

@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
 
-export const CardExercicios = ({ name, date, description, maxAttempts }) => {
+export const CardExercicios = ({ name, date, description, maxAttempts, myClass }) => {
   return (
     <Box borderRadius="xl" w="100%" h="100%" bg="#EBEBEB">
       <Box
@@ -17,7 +17,7 @@ export const CardExercicios = ({ name, date, description, maxAttempts }) => {
           <b>Data de entrega:</b> {date}{" "}
         </Text>
         <Text>
-          <b>Turma: </b> Arrumar o backend{" "}
+          <b>Turma: </b> {myClass || ''}
         </Text>
         <Text>
           <b>Número máximo de tentativas:</b> {maxAttempts}

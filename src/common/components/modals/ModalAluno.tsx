@@ -32,7 +32,6 @@ import { listClass } from "@/common/services/database/class";
 const schema = yup
   .object({
     ra: yup.string().required("Campo obrigatório"),
-    password: yup.string().required("Campo obrigatório"),
     name: yup.string().required("Campo obrigatório"),
     email: yup.string().email("E-mail inválido").required("Campo obrigatório"),
     classId: yup.object().required("Campo obrigatório"),
@@ -118,11 +117,7 @@ const ModalBase = ({}, ref) => {
               <FormInput placeholder="RA" {...register("ra")} />
               <FormInput placeholder="Nome" {...register("name")} />
               <FormInput placeholder="Email" {...register("email")} />
-              <FormInput
-                placeholder="Senha"
-                {...register("password")}
-                type="password"
-              />
+        
               <Controller
                 name="classId"
                 control={control}
