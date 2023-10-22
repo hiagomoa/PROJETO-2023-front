@@ -66,10 +66,16 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
                 name: i.student.name,
                 ra: i.student.ra,
                 isOk: `${i.totalAnswersOk}/${item.data.length}`,
-                endDate : exercise.dueDate
+                endDate: exercise.dueDate,
+                list_inOut: i.list_inOut,
+                exerciseCreated: exercise.created_at,
+                exerciseName: exercise.name,
+                url: i.answer,
               };
             });
             setProps({ ...props, exCurrent: r });
+          } else {
+            setProps({ ...props, exCurrent: null });
           }
         });
     }
@@ -94,8 +100,8 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             },
           }
         );
-        setIsOpen(!isOpen);
         toast.info("Arquivo enviado com sucesso!");
+        setIsOpen(false);
       } catch (error) {
         toast.info("Erro ao enviar o arquivo");
         console.error(error);
@@ -107,7 +113,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
 
   function MyModal() {
     if (scope == "prof" && props?.exCurrent) {
-     const date = new Date(props.exCurrent[0].endDate)
+      const date = new Date(props.exCurrent[0].endDate);
       return (
         <Box>
           <div
@@ -201,44 +207,50 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
               </div>
             </div>
 
-            {props.outPutEx ? (
+            {props?.outPutEx?.length >= 1 ? (
               <Box style={{ marginTop: "2px" }}>
                 <p style={{ paddingBottom: "8px", fontWeight: "bold" }}>
                   Resultado após as execuções
                 </p>
                 <div style={{ width: "50%" }}>
-                  <div
-                    style={{
-                      width: "100",
-                      background: "#fff",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "2px",
-                      borderRadius: "4px",
-                      border: "2px solid gray",
-                    }}
-                  >
-                    {" "}
-                    {`Test ${Number(props.outPutEx.testNumber)}`}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {" "}
-                      <span>{props.outPutEx.answer}</span>{" "}
-                      {props.outPutEx.answer == "OK" ? (
-                        <CheckCircle size={22} color="#33ba21" />
-                      ) : props.outPutEx.answer == "FALHOU" ? (
-                        <XCircle size={22} color="#ef531f" />
-                      ) : (
-                        <WarningCircle size={22} color="#efcd1f" />
-                      )}
-                    </div>
-                  </div>
+                  {props.outPutEx?.map((item: any, i: number) => {
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          width: "100",
+                          background: "#fff",
+                          margin : '10px 0',
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          padding: "2px",
+                          borderRadius: "4px",
+                          border: "2px solid gray",
+                        }}
+                      >
+                        {" "}
+                        {`Test ${Number(item.testNumber)}`}
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {" "}
+                          <span>{item.answer}</span>{" "}
+                          {item.answer == "OK" ? (
+                            <CheckCircle size={22} color="#33ba21" />
+                          ) : item.answer == "FALHOU" ? (
+                            <XCircle size={22} color="#ef531f" />
+                          ) : (
+                            <WarningCircle size={22} color="#efcd1f" />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </Box>
             ) : (
@@ -246,7 +258,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             )}
           </Box>
         ) : (
-          <></>
+          <>Sem resultado</>
         )}
       </>
     );
