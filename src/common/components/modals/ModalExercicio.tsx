@@ -1,4 +1,16 @@
-import { Box, Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalOverlay,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,8 +25,13 @@ import { queryClient } from "@/common/services/queryClient";
 import { FormMultiSelect } from "../inputs/FormMultiSelect";
 import { listClass } from "@/common/services/database/class";
 import dynamic from "next/dynamic";
-import { createExercise, getExerciseById, updateExercise } from "@/common/services/database/exercicio";
+import {
+  createExercise,
+  getExerciseById,
+  updateExercise,
+} from "@/common/services/database/exercicio";
 import { PlusCircle, Trash } from "@phosphor-icons/react";
+import { API_HOST } from "@/common/utils/config";
 
 const schema = yup.object({
   name: yup.string().required("Campo obrigatório"),
@@ -50,8 +67,6 @@ const ModalBase = ({}, ref) => {
     resolver: yupResolver(schema),
   });
 
-
-
   useImperativeHandle(ref, () => ({
     onOpen: async (id = null) => {
       reset({});
@@ -75,58 +90,58 @@ const ModalBase = ({}, ref) => {
     setFileBlocks([...fileBlocks, {}]);
   };
 
-  const removeFileBlock = (index :any) => {
+  const removeFileBlock = (index: any) => {
     const updatedBlocks = [...fileBlocks];
     updatedBlocks.splice(index, 1);
     setFileBlocks(updatedBlocks);
   };
 
-  const handleFileChange = (event:any, index:any, fileType :any) => {
-    const updatedBlocks:any = [...fileBlocks];
+  const handleFileChange = (event: any, index: any, fileType: any) => {
+    const updatedBlocks: any = [...fileBlocks];
     updatedBlocks[index][fileType] = event.target.files[0];
     setFileBlocks(updatedBlocks);
   };
 
-  const uploadFile = async (index:any, id : string) => {
-    const block:any = fileBlocks[index];
+  const uploadFile = async (index: any, id: string) => {
+    const block: any = fileBlocks[index];
 
-   
-      try {
-        const formData = new FormData();
-        formData.append("file", block.inFile );
-        formData.append("file", block.outFile );
+    try {
+      const formData = new FormData();
+      formData.append("file", block.inFile);
+      formData.append("file", block.outFile);
 
-        const response = await axios.post(`http://localhost:3001/upload?entity=exerciseTeacher&entityId=${id}`, formData);
+      const response = await axios.post(
+        `${API_HOST}/upload?entity=exerciseTeacher&entityId=${id}`,
+        formData
+      );
 
-        console.log("Upload bem-sucedido:", response.data);
+      console.log("Upload bem-sucedido:", response.data);
 
-        const updatedStatus:any = [...uploadStatus];
-        updatedStatus[index] = "Upload bem-sucedido";
-        setUploadStatus(updatedStatus);
-      } catch (error) {
-        console.error("Erro de upload:", error);
+      const updatedStatus: any = [...uploadStatus];
+      updatedStatus[index] = "Upload bem-sucedido";
+      setUploadStatus(updatedStatus);
+    } catch (error) {
+      console.error("Erro de upload:", error);
 
-        const updatedStatus:any = [...uploadStatus];
-        updatedStatus[index] = "Erro ao fazer upload";
-        setUploadStatus(updatedStatus);
-      }
+      const updatedStatus: any = [...uploadStatus];
+      updatedStatus[index] = "Erro ao fazer upload";
+      setUploadStatus(updatedStatus);
     }
-  
+  };
+
   const onSubmit = async (data: any) => {
-
-    if(!fileBlocks || !fileBlocks.length) {
-      alert('Please add file input ')
-      return
-    }
-  
-    for (const block  of fileBlocks) {
-      if( !block || block && !block.inFile || !block.outFile) {
-        alert('Please add file input ')
-        return
+    for (var i = 0; i < fileBlocks.length; i++) {
+      if (Object.keys(fileBlocks[i]).length === 0) {
+        return toast.error("Please add file input ");
       }
     }
-    
-  
+    for (const block of fileBlocks) {
+      if (!block || (block && !block.inFile) || !block.outFile) {
+        toast.error("Please add file input ");
+        return;
+      }
+    }
+
     if (data.id) {
       await updated.mutateAsync(data, {
         onSuccess: () => {
@@ -137,19 +152,22 @@ const ModalBase = ({}, ref) => {
     } else {
       data.classId = data?.classId?.id;
       data.professorId = session?.user?.id;
-     
-       const result =  await create.mutateAsync(data, {
-        onSuccess: () => {
-          toast.success("Exercício cadastrado com sucesso!");
-          queryClient.invalidateQueries(["prof"]);
-          onClose();
-        },
-      }).then(async (item) => {
-       await Promise.all(fileBlocks.map(async (f, i) => {
-          await uploadFile(i, item.id)
-          }))
-      });
 
+      const result = await create
+        .mutateAsync(data, {
+          onSuccess: () => {
+            toast.success("Exercício cadastrado com sucesso!");
+            queryClient.invalidateQueries(["prof"]);
+            onClose();
+          },
+        })
+        .then(async (item) => {
+          await Promise.all(
+            fileBlocks.map(async (f, i) => {
+              await uploadFile(i, item.id);
+            })
+          );
+        });
     }
   };
   return (
@@ -187,8 +205,8 @@ const ModalBase = ({}, ref) => {
                       placeholder="Turma"
                       label="Turma"
                       options={classes?.data}
-                      getOptionValue={(option:any) => option.id}
-                      getOptionLabel={(option:any) => option.name}
+                      getOptionValue={(option: any) => option.id}
+                      getOptionLabel={(option: any) => option.name}
                       error={errors.classId?.message}
                     />
                   )}
@@ -217,7 +235,6 @@ const ModalBase = ({}, ref) => {
                 />
               </Box>
               <div>
-              
                 {fileBlocks.map((block, index) => (
                   <div key={index}>
                     <Box
@@ -225,7 +242,7 @@ const ModalBase = ({}, ref) => {
                         display: "flex",
                         gap: "10px",
                         position: "relative",
-                        margin : "45px 0"
+                        margin: "45px 0",
                       }}
                     >
                       <Box
@@ -281,7 +298,7 @@ const ModalBase = ({}, ref) => {
                     </Box>
                   </div>
                 ))}
-                  <div
+                <div
                   style={{
                     width: "100%",
                     display: "flex",
@@ -318,6 +335,6 @@ const ModalBase = ({}, ref) => {
       </ModalContent>
     </Modal>
   );
-}
+};
 
 export const ModalExercicio = forwardRef(ModalBase);

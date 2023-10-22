@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import { useSession } from "next-auth/react";
 import { StudentTable } from "./listUsers";
+import { API_HOST } from "@/common/utils/config";
 interface IProps {
   exCurrent: any;
   outPutEx?: any;
@@ -22,7 +23,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
     setIsOpen(!isOpen);
     if (exercise && scope == "student") {
       axios
-        .post("http://localhost:3001/answer/out-put", {
+        .post(`${API_HOST}/answer/out-put`, {
           studentId: session?.user?.id,
           exerciseId: exercise.id,
         })
@@ -58,7 +59,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
         });
     } else if (exercise) {
       axios
-        .get(`http://localhost:3001/exercise/get-users-by-exc/${exercise.id}`)
+        .get(`${API_HOST}/exercise/get-users-by-exc/${exercise.id}`)
         .then((item: any) => {
           if (item.data.length >= 1) {
             const r = item.data.map((i: any) => {
@@ -92,7 +93,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
       formData.append("file", file);
       try {
         await axios.post(
-          `http://localhost:3001/upload?entity=studentAnswer&studentId=${session?.user?.id}&exerciseId=${props?.exCurrent?.id}`,
+          `${API_HOST}/upload?entity=studentAnswer&studentId=${session?.user?.id}&exerciseId=${props?.exCurrent?.id}`,
           formData,
           {
             headers: {
