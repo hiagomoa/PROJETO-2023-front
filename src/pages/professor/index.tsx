@@ -98,7 +98,7 @@ const Professor = () => {
             </Button>
           </Flex>
 
-          <ListExercises exercises={exercise?.data} />
+          <ListExercises  scope="prof" exercises={exercise?.data} />
         </Box>
       </Container>
       <ModalExercicio ref={modalexercicio} />

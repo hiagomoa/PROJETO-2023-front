@@ -7,18 +7,20 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import { useSession } from "next-auth/react";
+import { StudentTable } from "./listUsers";
 interface IProps {
   exCurrent: any;
   outPutEx?: any;
 }
-const ListExercises = ({ exercises }: any) => {
+const ListExercises = ({ exercises, scope = "student" }: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
   const { data: session } = useSession();
   const [props, setProps] = useState<IProps>();
+
   function updateModal(exercise?: any) {
     setIsOpen(!isOpen);
-    if (exercise) {
+    if (exercise && scope == "student") {
       axios
         .post("http://localhost:3001/answer/out-put", {
           studentId: session?.user?.id,
@@ -50,9 +52,25 @@ const ListExercises = ({ exercises }: any) => {
               maxAttempts: exercise.maxAttempts,
               id: exercise.id,
             },
-            outPutEx : null
+            outPutEx: null,
           });
           console.log(error.message);
+        });
+    } else if (exercise) {
+      axios
+        .get(`http://localhost:3001/exercise/get-users-by-exc/${exercise.id}`)
+        .then((item: any) => {
+          if (item.data.length >= 1) {
+            const r = item.data.map((i: any) => {
+              return {
+                name: i.student.name,
+                ra: i.student.ra,
+                isOk: `${i.totalAnswersOk}/${item.data.length}`,
+                endDate : exercise.dueDate
+              };
+            });
+            setProps({ ...props, exCurrent: r });
+          }
         });
     }
   }
@@ -88,6 +106,28 @@ const ListExercises = ({ exercises }: any) => {
   };
 
   function MyModal() {
+    if (scope == "prof" && props?.exCurrent) {
+     const date = new Date(props.exCurrent[0].endDate)
+      return (
+        <Box>
+          <div
+            style={{
+              fontWeight: "bold",
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span> Data de finalização {formatDateTime(date)} </span>
+          </div>
+
+          <Box>
+            <StudentTable data={props?.exCurrent} />
+          </Box>
+        </Box>
+      );
+    }
     return (
       <>
         {props?.exCurrent ? (
