@@ -32,7 +32,7 @@ const Turmas = () => {
     );
   };
 
-  const handleEditClick = (id) => {
+  const handleEditClick = (id: string) => {
     modalturmas.current.onOpen(id);
   };
 

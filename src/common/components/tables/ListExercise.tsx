@@ -288,18 +288,17 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             sx={{
               display: "flex",
               gap: "1.5rem",
-              mt: "1.5rem",
               flexDirection: "column",
             }}
           >
             <Box
               sx={{
                 display: "flex",
+                mt: "0px",
                 alignItems: "center",
                 justifyContent: "space-between",
               }}
               flexDirection="row"
-              fontSize="3xl"
             >
               <Text fontWeight="bold" color="#313B6D">
                 Editar exercicio
