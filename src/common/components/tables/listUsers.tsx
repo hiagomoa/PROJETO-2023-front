@@ -1,9 +1,9 @@
-import DataTable from "react-data-table-component";
-import { ModalMain } from "../modals/ModalMain";
-import { useState } from "react";
+import { formatDateTime } from "@/common/utils/formatDateTime";
 import { Box, Button } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
-import { formatDateTime } from "@/common/utils/formatDateTime";
+import { useState } from "react";
+import DataTable from "react-data-table-component";
+import { ModalMain } from "../modals/ModalMain";
 
 interface IStudentTable {
   data: {
@@ -46,9 +46,15 @@ export function StudentTable({ data }: IStudentTable) {
         <p style={{ padding: "30px 0", fontWeight: "bold" }}>
           Data de Submisão : {formatDateTime(date)}
         </p>
-        <Button bg="#3182CE"
-        onClick={() => window.location.replace(currentRow.url)}
-        mb={4} color="white" type="button">Baixar o ficheiro</Button>
+        <Button
+          bg="#3182CE"
+          onClick={() => window.location.replace(currentRow.url)}
+          mb={4}
+          color="white"
+          type="button"
+        >
+          Baixar o ficheiro
+        </Button>
         <div style={{ width: "50%" }}>
           {currentRow?.list_inOut?.map((item: any, i: number) => {
             return (
@@ -97,7 +103,7 @@ export function StudentTable({ data }: IStudentTable) {
       exerciseName: r.exerciseName,
       exerciseCreated: r.exerciseCreated,
       list_inOut: r.list_inOut,
-      url : r.url
+      url: r.url,
     });
     closeModal();
   }

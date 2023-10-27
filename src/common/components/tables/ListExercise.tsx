@@ -5,7 +5,7 @@ import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { FormEditorHtml } from "../inputs/FormEditorHtml";
 import { ModalMain } from "../modals/ModalMain";
@@ -73,7 +73,6 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             },
             outPutEx: null,
           });
-          console.log(error.message);
         });
     } else if (exercise) {
       axios
@@ -99,10 +98,6 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
         });
     }
   }
-
-  useEffect(() => {
-    console.log(exercises);
-  }, [exercises]);
 
   const handleFileChange = (e: any) => {
     const selectedFile = e.target.files[0];
@@ -138,10 +133,18 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
   const [value, setValue] = useState("");
 
   function MyModal() {
-    if (scope == "prof" && props?.exCurrent) {
+    if (
+      scope == "prof" &&
+      props?.exCurrent &&
+      new Date(props.exCurrent[0].endDate.split(":00.")[0]) < new Date()
+    ) {
       const date = new Date(props.exCurrent[0].endDate);
+
       return (
         <Box>
+          <Text fontWeight="bold" mb="1.5rem" color="#313B6D">
+            {props.exCurrent[0].exerciseName}
+          </Text>
           <div
             style={{
               fontWeight: "bold",
@@ -159,7 +162,132 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
           </Box>
         </Box>
       );
+    } else if (
+      scope == "prof" &&
+      props?.exCurrent &&
+      new Date(props.exCurrent[0].endDate.split(":00.")[0]) > new Date()
+    ) {
+      const date = new Date(props.exCurrent[0].endDate);
+
+      return (
+        <>
+          <Box
+            sx={{
+              display: "flex",
+              gap: "1.5rem",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                mt: "0px",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+              flexDirection="row"
+            >
+              <Text fontWeight="bold" color="#313B6D">
+                Editar exercicio
+              </Text>
+
+              <Box sx={{ display: "flex", gap: "1.5rem" }}>
+                <Button bg="#3182CE" color="white" maxWidth="180px">
+                  Executar verificacao
+                </Button>
+                <Button
+                  bg="#3182CE"
+                  color="white"
+                  onClick={(e) => updateExercise()}
+                  maxWidth="180px"
+                >
+                  Salvar
+                </Button>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: "1.5rem",
+              }}
+            >
+              <Input
+                type="datetime-local"
+                value={editDateExercise}
+                onChange={(e) => setEditDateExercise(e.target.value)}
+                maxW="17rem"
+              />
+              <Input
+                type="number"
+                defaultValue={editMaxAttempts}
+                onChange={(e) => setEditMaxAttempts(Number(e.target.value))}
+                maxW="17rem"
+              />
+            </Box>
+            <Input
+              value={editExerciseDescription}
+              onChange={(e) => setEditExerciseDescription(e.target.value)}
+              placeholder="Assunto"
+            />
+            <Box h="30rem" boxSizing="border-box">
+              <FormEditorHtml
+                value={editHtmlExercise}
+                onChange={(e: any) => setEditHtmlExercise(e)}
+              />
+            </Box>
+          </Box>
+
+          <Text fontWeight="bold" color="#313B6D" mb="1.5rem">
+            Exercicios pendentes
+          </Text>
+
+          <StudentTable data={props?.exCurrent} />
+        </>
+      );
+    } else if (
+      scope == "prof" &&
+      !props?.exCurrent &&
+      new Date(editDateExercise!) < new Date()
+    ) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            width: "100%",
+            minHeight: "600px",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text fontWeight="bold" color="#313B6D">
+            EXERCICIO FINALIZADO E SEM PENDENCIAS DE CORRECAO!
+          </Text>
+        </Box>
+      );
     }
+
+    //   if (
+    //     scope == "prof" &&
+    //     props?.exCurrent &&
+    //     new Date(props.exCurrent[0].endDate.split(":00.")[0]) > new Date()
+    //   ) {
+    //     return (
+    //       <div style={{ width: "50px", height: "50px", background: "red" }}>
+    //         1 na conta
+    //       </div>
+    //     );
+    //   }
+
+    // if (
+    //   scope == "prof" &&
+    //   props?.exCurrent &&
+    //   selectedExercise &&
+    //   new Date(selectedExercise.dueDate) > new Date()
+    // ) {
+    //   return <>123</>;
+    // }
+
     return (
       <>
         {props?.exCurrent ? (
@@ -218,7 +346,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
               >
                 <input
                   type="file"
-                  accept=".py, .out"
+                  accept=".py, .out, .in"
                   onChange={handleFileChange}
                 />
                 <Button
@@ -233,7 +361,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
               </div>
             </div>
 
-            {props?.outPutEx?.length >= 1 ? (
+            {props?.outPutEx?.length >= 1 && (
               <Box style={{ marginTop: "2px" }}>
                 <p style={{ paddingBottom: "8px", fontWeight: "bold" }}>
                   Resultado após as execuções
@@ -279,76 +407,77 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
                   })}
                 </div>
               </Box>
-            ) : (
-              <></>
             )}
           </Box>
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              gap: "1.5rem",
-              flexDirection: "column",
-            }}
-          >
+          new Date(editDateExercise || "") > new Date() && (
             <Box
               sx={{
                 display: "flex",
-                mt: "0px",
-                alignItems: "center",
-                justifyContent: "space-between",
+                gap: "1.5rem",
+                flexDirection: "column",
               }}
-              flexDirection="row"
             >
-              <Text fontWeight="bold" color="#313B6D">
-                Editar exercicio
-              </Text>
-              <Box sx={{ display: "flex", gap: "1.5rem" }}>
-                <Button bg="#3182CE" color="white" maxWidth="180px">
-                  Executar verificacao
-                </Button>
-                <Button
-                  bg="#3182CE"
-                  color="white"
-                  onClick={(e) => updateExercise()}
-                  maxWidth="180px"
-                >
-                  Salvar
-                </Button>
+              <Box
+                sx={{
+                  display: "flex",
+                  mt: "0px",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+                flexDirection="row"
+              >
+                <Text fontWeight="bold" color="#313B6D">
+                  Editar exercicio
+                </Text>
+
+                <Box sx={{ display: "flex", gap: "1.5rem" }}>
+                  <Button bg="#3182CE" color="white" maxWidth="180px">
+                    Executar verificacao
+                  </Button>
+                  <Button
+                    bg="#3182CE"
+                    color="white"
+                    onClick={(e) => updateExercise()}
+                    maxWidth="180px"
+                  >
+                    Salvar
+                  </Button>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: "1.5rem",
+                }}
+              >
+                <Input
+                  type="datetime-local"
+                  value={editDateExercise}
+                  onChange={(e) => setEditDateExercise(e.target.value)}
+                  maxW="17rem"
+                />
+                <Input
+                  type="number"
+                  defaultValue={editMaxAttempts}
+                  onChange={(e) => setEditMaxAttempts(Number(e.target.value))}
+                  maxW="17rem"
+                />
+              </Box>
+              <Input
+                value={editExerciseDescription}
+                onChange={(e) => setEditExerciseDescription(e.target.value)}
+                placeholder="Assunto"
+              />
+              <Box h="30rem" boxSizing="border-box">
+                <FormEditorHtml
+                  value={editHtmlExercise}
+                  onChange={(e: any) => setEditHtmlExercise(e)}
+                />
               </Box>
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                mt: "1.5rem",
-              }}
-            >
-              <Input
-                type="datetime-local"
-                value={editDateExercise}
-                onChange={(e) => setEditDateExercise(e.target.value)}
-                maxW="17rem"
-              />
-              <Input
-                type="number"
-                defaultValue={editMaxAttempts}
-                onChange={(e) => setEditMaxAttempts(Number(e.target.value))}
-                maxW="17rem"
-              />
-            </Box>
-            <Input
-              value={editExerciseDescription}
-              onChange={(e) => setEditExerciseDescription(e.target.value)}
-              placeholder="Assunto"
-            />
-            <Box h="30rem" boxSizing="border-box">
-              <FormEditorHtml
-                value={editHtmlExercise}
-                onChange={(e: any) => setEditHtmlExercise(e)}
-              />
-            </Box>
-          </Box>
+          )
         )}
       </>
     );
@@ -378,7 +507,9 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             <CardExercicios
               name={exercise?.name}
               description={exercise?.description}
-              date={formatDateTime(new Date(exercise?.dueDate))}
+              date={formatDateTime(
+                new Date(exercise?.dueDate.split(":00.")[0])
+              )}
               maxAttempts={exercise?.maxAttempts}
               myClass={exercise?.className}
             />

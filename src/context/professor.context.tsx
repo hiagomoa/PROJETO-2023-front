@@ -86,7 +86,7 @@ export const ProfessorProvider = ({ children }: any) => {
       setEditHtmlExercise(selectedExercise?.html);
     }
     if (selectedExercise?.dueDate) {
-      setEditDateExercise(selectedExercise?.dueDate.split(":0")[0]);
+      setEditDateExercise(selectedExercise?.dueDate.split(":00.")[0]);
     }
     if (selectedExercise?.maxAttempts) {
       setEditMaxAttempts(selectedExercise?.maxAttempts);
@@ -100,19 +100,6 @@ export const ProfessorProvider = ({ children }: any) => {
     string | undefined
   >();
   const [editMaxAttempts, setEditMaxAttempts] = useState<number | undefined>();
-  useEffect(() => {
-    console.log(editHtmlExercise);
-  }, [editHtmlExercise]);
-  useEffect(() => {
-    console.log(editDateExercise);
-  }, [editDateExercise]);
-  useEffect(() => {
-    console.log(editMaxAttempts);
-  }, [editMaxAttempts]);
-
-  useEffect(() => {
-    console.log(editExerciseDescription);
-  }, [editExerciseDescription]);
 
   return (
     <ProfessorContext.Provider

@@ -1,5 +1,4 @@
 import {
-  Box,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -28,13 +27,11 @@ export const ModalMain = (props: IModalMainProps) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent minW="60%">
-        <Box>
-          <ModalHeader color="#313B6D">{props.modalProps?.title}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody style={{ background: "" }}>
-            {props.modalProps?.content}
-          </ModalBody>
-        </Box>
+        <ModalHeader color="#313B6D">{props.modalProps?.title}</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody style={{ background: "" }}>
+          {props.modalProps?.content}
+        </ModalBody>
       </ModalContent>
     </Modal>
   );
