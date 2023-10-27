@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import { Box, Button, Grid, GridItem } from "@chakra-ui/react";
-import { CardExercicios } from "../professor/CardExercicios";
-import { formatDateTime } from "@/common/utils/formatDateTime";
-import { ModalMain } from "../modals/ModalMain";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
-import { useSession } from "next-auth/react";
-import { StudentTable } from "./listUsers";
 import { API_HOST } from "@/common/utils/config";
+import { formatDateTime } from "@/common/utils/formatDateTime";
+import { Exercise, ProfessorContext } from "@/context/professor.context";
+import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
+import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import { FormEditorHtml } from "../inputs/FormEditorHtml";
+import { ModalMain } from "../modals/ModalMain";
+import { CardExercicios } from "../professor/CardExercicios";
+import { StudentTable } from "./listUsers";
 interface IProps {
   exCurrent: any;
   outPutEx?: any;
@@ -18,10 +20,26 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
   const [file, setFile] = useState(null);
   const { data: session } = useSession();
   const [props, setProps] = useState<IProps>();
+  const {
+    handleSelectExercise,
+    selectedExercise,
+    editExerciseDescription,
+    setEditExerciseDescription,
+    editDateExercise,
+    editHtmlExercise,
+    editMaxAttempts,
+    setEditDateExercise,
+    setEditHtmlExercise,
+    setEditMaxAttempts,
+    updateExercise,
+  } = useContext(ProfessorContext);
+
+  const refSelected = useRef<Exercise>(null);
 
   function updateModal(exercise?: any) {
     setIsOpen(!isOpen);
     if (exercise && scope == "student") {
+      // @ts-ignore
       axios
         .post(`${API_HOST}/answer/out-put`, {
           studentId: session?.user?.id,
@@ -82,6 +100,10 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
     }
   }
 
+  useEffect(() => {
+    console.log(exercises);
+  }, [exercises]);
+
   const handleFileChange = (e: any) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
@@ -92,6 +114,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
       const formData = new FormData();
       formData.append("file", file);
       try {
+        // @ts-ignore
         await axios.post(
           `${API_HOST}/upload?entity=studentAnswer&studentId=${session?.user?.id}&exerciseId=${props?.exCurrent?.id}`,
           formData,
@@ -111,6 +134,8 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
       toast.info("Selecione um arquivo para enviar.");
     }
   };
+
+  const [value, setValue] = useState("");
 
   function MyModal() {
     if (scope == "prof" && props?.exCurrent) {
@@ -221,7 +246,7 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
                         style={{
                           width: "100",
                           background: "#fff",
-                          margin : '10px 0',
+                          margin: "10px 0",
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
@@ -259,7 +284,72 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
             )}
           </Box>
         ) : (
-          <>Sem resultado</>
+          <Box
+            sx={{
+              display: "flex",
+              gap: "1.5rem",
+              mt: "1.5rem",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+              flexDirection="row"
+              fontSize="3xl"
+            >
+              <Text fontWeight="bold" color="#313B6D">
+                Editar exercicio
+              </Text>
+              <Box sx={{ display: "flex", gap: "1.5rem" }}>
+                <Button bg="#3182CE" color="white" maxWidth="180px">
+                  Executar verificacao
+                </Button>
+                <Button
+                  bg="#3182CE"
+                  color="white"
+                  onClick={(e) => updateExercise()}
+                  maxWidth="180px"
+                >
+                  Salvar
+                </Button>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: "1.5rem",
+              }}
+            >
+              <Input
+                type="datetime-local"
+                value={editDateExercise}
+                onChange={(e) => setEditDateExercise(e.target.value)}
+                maxW="17rem"
+              />
+              <Input
+                type="number"
+                defaultValue={editMaxAttempts}
+                onChange={(e) => setEditMaxAttempts(Number(e.target.value))}
+                maxW="17rem"
+              />
+            </Box>
+            <Input
+              value={editExerciseDescription}
+              onChange={(e) => setEditExerciseDescription(e.target.value)}
+              placeholder="Assunto"
+            />
+            <Box h="30rem" boxSizing="border-box">
+              <FormEditorHtml
+                value={editHtmlExercise}
+                onChange={(e: any) => setEditHtmlExercise(e)}
+              />
+            </Box>
+          </Box>
         )}
       </>
     );
@@ -278,10 +368,12 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
         }}
       />
       <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
-        {exercises?.map((exercise: any, key: number) => (
+        {exercises?.map((exercise: Exercise, key: number) => (
           <GridItem
             key={key}
-            onClick={() => updateModal(exercise)}
+            onClick={() => {
+              handleSelectExercise(exercise), updateModal(exercise);
+            }}
             style={{ cursor: "pointer" }}
           >
             <CardExercicios
