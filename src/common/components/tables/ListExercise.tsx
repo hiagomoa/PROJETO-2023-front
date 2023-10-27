@@ -5,7 +5,7 @@ import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { FormEditorHtml } from "../inputs/FormEditorHtml";
 import { ModalMain } from "../modals/ModalMain";
@@ -34,7 +34,9 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
     updateExercise,
   } = useContext(ProfessorContext);
 
-  const refSelected = useRef<Exercise>(null);
+  const [dueToday, setDueToday] = useState<any[]>();
+  const [dueLater, setDueLater] = useState<any[]>();
+  const [duePast, setDuePast] = useState<any[]>();
 
   function updateModal(exercise?: any) {
     setIsOpen(!isOpen);
@@ -237,12 +239,10 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
               />
             </Box>
           </Box>
-
           <Text fontWeight="bold" color="#313B6D" mb="1.5rem">
             Exercicios pendentes
           </Text>
-
-          <StudentTable data={props?.exCurrent} />
+          <StudentTable data={props.exCurrent} />
         </>
       );
     } else if (
@@ -483,6 +483,52 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
     );
   }
 
+  useEffect(() => {
+    const dueToday = exercises?.filter((item: any, i: number) => {
+      let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+      if (
+        dueDate.getDay() === new Date().getDay() &&
+        dueDate.getMonth() === new Date().getMonth() &&
+        dueDate.getFullYear() === new Date().getFullYear()
+      ) {
+        return item;
+      }
+    });
+
+    const dueLater = exercises?.filter((item: any, i: number) => {
+      console.log(item);
+
+      let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+      if (
+        dueDate.getDay() > new Date().getDay() &&
+        dueDate.getMonth() >= new Date().getMonth() &&
+        dueDate.getFullYear() >= new Date().getFullYear()
+      ) {
+        return item;
+      }
+    });
+
+    const duePast = exercises?.filter((item: any, i: number) => {
+      let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+      if (
+        dueDate.getDay() < new Date().getDay() &&
+        dueDate.getMonth() <= new Date().getMonth() &&
+        dueDate.getFullYear() <= new Date().getFullYear()
+      ) {
+        return item;
+      }
+    });
+
+    setDueLater(dueLater);
+    setDueToday(dueToday);
+    setDuePast(duePast);
+
+    console.log({ dueToday, dueLater, duePast });
+  }, [exercises]);
+
   return (
     <>
       <ToastContainer />
@@ -495,27 +541,105 @@ const ListExercises = ({ exercises, scope = "student" }: any) => {
           title: props?.exCurrent?.title,
         }}
       />
-      <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
-        {exercises?.map((exercise: Exercise, key: number) => (
-          <GridItem
-            key={key}
-            onClick={() => {
-              handleSelectExercise(exercise), updateModal(exercise);
-            }}
-            style={{ cursor: "pointer" }}
-          >
-            <CardExercicios
-              name={exercise?.name}
-              description={exercise?.description}
-              date={formatDateTime(
-                new Date(exercise?.dueDate.split(":00.")[0])
-              )}
-              maxAttempts={exercise?.maxAttempts}
-              myClass={exercise?.className}
-            />
-          </GridItem>
-        ))}
-      </Grid>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+        }}
+      >
+        <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
+          {dueLater?.length === 0 && <Text>Nenhum exercício encontrado</Text>}
+          {dueLater?.map((exercise: Exercise, key: number) => (
+            <GridItem
+              key={key}
+              onClick={() => {
+                handleSelectExercise(exercise), updateModal(exercise);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <CardExercicios
+                name={exercise?.name}
+                description={exercise?.description}
+                date={formatDateTime(
+                  new Date(exercise?.dueDate.split(":00.")[0])
+                )}
+                maxAttempts={exercise?.maxAttempts}
+                myClass={exercise?.className}
+              />
+            </GridItem>
+          ))}
+        </Grid>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+          mt: "4rem",
+        }}
+      >
+        <Text color="#313B6D" fontWeight="bold" fontSize="3xl">
+          EXERCÍCIOS ATRASADOS
+        </Text>
+        <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
+          {dueToday?.length === 0 && <Text>Nenhum exercício encontrado</Text>}
+          {dueToday?.map((exercise: Exercise, key: number) => (
+            <GridItem
+              key={key}
+              onClick={() => {
+                handleSelectExercise(exercise), updateModal(exercise);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <CardExercicios
+                name={exercise?.name}
+                description={exercise?.description}
+                date={formatDateTime(
+                  new Date(exercise?.dueDate.split(":00.")[0])
+                )}
+                maxAttempts={exercise?.maxAttempts}
+                myClass={exercise?.className}
+              />
+            </GridItem>
+          ))}
+        </Grid>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+          mt: "4rem",
+        }}
+      >
+        <Text color="#313B6D" fontWeight="bold" fontSize="3xl">
+          EXERCÍCIOS CONCLUIDOS E VENCIDOS
+        </Text>
+        <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
+          {duePast?.length === 0 && <Text>Nenhum exercício encontrado</Text>}
+          {duePast?.map((exercise: Exercise, key: number) => (
+            <GridItem
+              key={key}
+              onClick={() => {
+                handleSelectExercise(exercise), updateModal(exercise);
+              }}
+              style={{ cursor: "pointer" }}
+            >
+              <CardExercicios
+                name={exercise?.name}
+                description={exercise?.description}
+                date={formatDateTime(
+                  new Date(exercise?.dueDate.split(":00.")[0])
+                )}
+                maxAttempts={exercise?.maxAttempts}
+                myClass={exercise?.className}
+              />
+            </GridItem>
+          ))}
+        </Grid>
+      </Box>
     </>
   );
 };

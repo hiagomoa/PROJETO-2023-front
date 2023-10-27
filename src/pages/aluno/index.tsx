@@ -5,7 +5,7 @@ import ListExercises from "@/common/components/tables/ListExercise";
 import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
 import { withPermission } from "@/common/utils/withPermission";
-import { Box, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
