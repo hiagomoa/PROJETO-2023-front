@@ -1,9 +1,9 @@
 import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
-import { Container } from "./Container";
-import { ModalProfessor } from "../modals/ModalProfessor";
-import { useRef } from "react";
-import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useRef } from "react";
+import { ModalProfessor } from "../modals/ModalProfessor";
+import { Container } from "./Container";
 
 export const LayoutAlunos = ({ children }) => {
   const { data: session } = useSession();
@@ -115,7 +115,6 @@ export const LayoutProfessor = ({ children }) => {
                 ALUNOS
               </Text>
             </Flex>
-
             <Box>
               <Flex alignItems="center" h="100%">
                 <Text as="button" onClick={() => signOut()}>

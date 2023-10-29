@@ -9,25 +9,26 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  UseDisclosureProps,
   useDisclosure,
 } from "@chakra-ui/react";
-import { forwardRef, useImperativeHandle } from "react";
-import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Ref, forwardRef, useImperativeHandle } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation, useQuery } from "react-query";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 import { FormInput } from "../inputs/FormInput";
-import { toast } from "react-toastify";
-import { useMutation, useQuery } from "react-query";
 
-import { useSession } from "next-auth/react";
-import { queryClient } from "@/common/services/queryClient";
+import { listClass } from "@/common/services/database/class";
 import {
   createStudent,
   getStudentById,
   updateStudent,
 } from "@/common/services/database/student";
+import { queryClient } from "@/common/services/queryClient";
+import { useSession } from "next-auth/react";
 import { FormMultiSelect } from "../inputs/FormMultiSelect";
-import { listClass } from "@/common/services/database/class";
 
 const schema = yup
   .object({
@@ -38,7 +39,10 @@ const schema = yup
   })
   .required();
 
-const ModalBase = ({}, ref) => {
+const ModalBase = (
+  { classId, isOnClassEdit }: { classId?: string; isOnClassEdit?: boolean },
+  ref: Ref<UseDisclosureProps>
+) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const getById = useMutation(getStudentById);
   const create = useMutation(createStudent);
@@ -117,9 +121,14 @@ const ModalBase = ({}, ref) => {
               <FormInput placeholder="RA" {...register("ra")} />
               <FormInput placeholder="Nome" {...register("name")} />
               <FormInput placeholder="Email" {...register("email")} />
-        
+
               <Controller
                 name="classId"
+                defaultValue={
+                  classId && isOnClassEdit
+                    ? classes.data.find((option) => option.id === classId)
+                    : undefined
+                }
                 control={control}
                 render={({ field }) => (
                   <FormMultiSelect

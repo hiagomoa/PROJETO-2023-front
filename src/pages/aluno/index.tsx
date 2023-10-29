@@ -5,10 +5,11 @@ import ListExercises from "@/common/components/tables/ListExercise";
 import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
 import { withPermission } from "@/common/utils/withPermission";
-import { Box, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
+import { Exercise } from "@/context/professor.context";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import * as yup from "yup";
@@ -50,6 +51,54 @@ const Alunos = () => {
     listExercises
   );
 
+  const [dueToday, setDueToday] = useState<Exercise[]>();
+  const [dueLater, setDueLater] = useState<Exercise[]>();
+  const [duePast, setDuePast] = useState<Exercise[]>();
+
+  useEffect(() => {
+    const dueToday = exercise?.data.filter((item: any, i: number) => {
+      let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+      if (
+        dueDate.getDay() < new Date().getDay() &&
+        dueDate.getMonth() <= new Date().getMonth() &&
+        dueDate.getFullYear() <= new Date().getFullYear()
+      ) {
+        return item;
+      }
+    });
+
+    const dueLater = exercise?.data.filter((item: any, i: number) => {
+      console.log(item);
+
+      const dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+      if (
+        dueDate.getDay() >= new Date().getDay() &&
+        dueDate.getMonth() >= new Date().getMonth() &&
+        dueDate.getFullYear() >= new Date().getFullYear()
+      ) {
+        return item;
+      }
+    });
+
+    // const duePast = exercise?.data.filter((item: any, i: number) => {
+    //   let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+
+    //   if (
+    //     dueDate.getDay() < new Date().getDay() &&
+    //     dueDate.getMonth() <= new Date().getMonth() &&
+    //     dueDate.getFullYear() <= new Date().getFullYear()
+    //   ) {
+    //     return item;
+    //   }
+    // });
+
+    setDueLater(dueLater);
+    setDueToday(dueToday);
+    // setDuePast(duePast);
+  }, [exercise]);
+
   return (
     <>
       <LayoutAlunos>
@@ -90,7 +139,27 @@ const Alunos = () => {
               </Box>
             </Flex>
           </Box>
-          <ListExercises exercises={exercise?.data} />
+          {dueLater && <ListExercises data={dueLater} />}
+          <Text
+            color="#313B6D"
+            mt="4rem"
+            mb="2rem"
+            fontWeight="bold"
+            fontSize="3xl"
+          >
+            EXERCÍCIOS ATRASADOS
+          </Text>
+          {dueToday && <ListExercises data={dueToday} />}
+          <Text
+            color="#313B6D"
+            mt="4rem"
+            mb="2rem"
+            fontWeight="bold"
+            fontSize="3xl"
+          >
+            EXERCÍCIOS CONCLUIDOS
+          </Text>
+          {duePast && <ListExercises data={duePast} />}
         </Container>
       </LayoutAlunos>
     </>

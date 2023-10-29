@@ -1,18 +1,18 @@
+import { FormMultiSelect } from "@/common/components/inputs/FormMultiSelect";
 import { Container } from "@/common/components/layout/Container";
 import { LayoutProfessor } from "@/common/components/layout/Layout";
-import { Box, Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
-import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { ModalExercicio } from "@/common/components/modals/ModalExercicio";
-import { useRef, useState } from "react";
-import { withPermission } from "@/common/utils/withPermission";
-import { FormMultiSelect } from "@/common/components/inputs/FormMultiSelect";
-import { useQuery } from "react-query";
-import { listClass } from "@/common/services/database/class";
-import { useSession } from "next-auth/react";
 import ListExercises from "@/common/components/tables/ListExercise";
+import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
+import { withPermission } from "@/common/utils/withPermission";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useSession } from "next-auth/react";
+import { useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useQuery } from "react-query";
+import * as yup from "yup";
 
 const schema = yup
   .object({
@@ -77,7 +77,7 @@ const Professor = () => {
                     placeholder="Turma"
                     options={[
                       { id: null, name: "Todas as Turmas" }, // Opção para limpar o filtro
-                      ...(classes?.data || []), 
+                      ...(classes?.data || []),
                     ]}
                     getOptionValue={(option: any) => option.id}
                     getOptionLabel={(option: any) => option.name}
@@ -98,7 +98,7 @@ const Professor = () => {
             </Button>
           </Flex>
 
-          <ListExercises  scope="prof" exercises={exercise?.data} />
+          <ListExercises scope="prof" data={exercise?.data} />
         </Box>
       </Container>
       <ModalExercicio ref={modalexercicio} />

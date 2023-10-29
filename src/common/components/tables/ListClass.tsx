@@ -1,8 +1,17 @@
+import { IClass } from "@/common/interfaces/class.interface";
 import { Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import { ModalTurma } from "../modals/ModalTurma";
 import { useRef } from "react";
+import { ModalTurma } from "../modals/ModalTurma";
 
-const ListClass = ({ classes, handleEditClick, handleDeleteConfirmation }) => {
+const ListClass = ({
+  classes,
+  handleEditClick,
+  handleDeleteConfirmation,
+}: {
+  classes: IClass[];
+  handleEditClick: (id: string) => void;
+  handleDeleteConfirmation: (id: string) => void;
+}) => {
   const modalturmas = useRef();
 
   return (

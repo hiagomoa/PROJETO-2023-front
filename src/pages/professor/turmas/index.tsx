@@ -8,7 +8,7 @@ import { queryClient } from "@/common/services/queryClient";
 import { withPermission } from "@/common/utils/withPermission";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 
 const Turmas = () => {
@@ -22,6 +22,10 @@ const Turmas = () => {
     listClass
   );
 
+  useEffect(() => {
+    console.log(classes);
+  }, [classes]);
+
   const handleDeleteConfirmation = (id) => {
     modaldelete?.current.open(
       "Tem certeza de que deseja excluir está classe?",
@@ -32,7 +36,7 @@ const Turmas = () => {
     );
   };
 
-  const handleEditClick = (id) => {
+  const handleEditClick = (id: string) => {
     modalturmas.current.onOpen(id);
   };
 

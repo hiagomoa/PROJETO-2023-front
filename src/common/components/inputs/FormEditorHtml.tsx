@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   FormControl,
@@ -13,8 +12,9 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import { useState } from "react";
 import "react-quill/dist/quill.snow.css";
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 export const FormEditorHtml = ({
   label,
@@ -59,7 +59,7 @@ export const FormEditorHtml = ({
       value: "2em",
     },
   };
-  
+
   const modules = {
     toolbar: {
       container: [
@@ -91,8 +91,9 @@ export const FormEditorHtml = ({
           </InputLeftAddon>
         )}
         {leftElement && <InputLeftElement>{leftElement}</InputLeftElement>}
-        <Box w='full'>
+        <Box w="full" sx={{ height: "25rem" }}>
           <ReactQuill
+            style={{ height: "100%" }}
             value={content}
             onChange={handleChange}
             modules={modules}

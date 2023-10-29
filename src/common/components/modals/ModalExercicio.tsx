@@ -1,3 +1,11 @@
+import { listClass } from "@/common/services/database/class";
+import {
+  createExercise,
+  getExerciseById,
+  updateExercise,
+} from "@/common/services/database/exercicio";
+import { queryClient } from "@/common/services/queryClient";
+import { API_HOST } from "@/common/utils/config";
 import {
   Box,
   Button,
@@ -6,32 +14,24 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalHeader,
   ModalFooter,
+  ModalHeader,
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { forwardRef, useImperativeHandle, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { FormInput } from "../inputs/FormInput";
-import { FormDate } from "../inputs/FormDate"; // Importe o componente FormDate corretamente
-import axios from "axios";
-import { useMutation, useQuery } from "react-query";
-import { useSession } from "next-auth/react";
-import { toast } from "react-toastify";
-import { queryClient } from "@/common/services/queryClient";
-import { FormMultiSelect } from "../inputs/FormMultiSelect";
-import { listClass } from "@/common/services/database/class";
-import dynamic from "next/dynamic";
-import {
-  createExercise,
-  getExerciseById,
-  updateExercise,
-} from "@/common/services/database/exercicio";
 import { PlusCircle, Trash } from "@phosphor-icons/react";
-import { API_HOST } from "@/common/utils/config";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation, useQuery } from "react-query";
+import { toast } from "react-toastify";
+import * as yup from "yup";
+import { FormDate } from "../inputs/FormDate"; // Importe o componente FormDate corretamente
+import { FormInput } from "../inputs/FormInput";
+import { FormMultiSelect } from "../inputs/FormMultiSelect";
 
 const schema = yup.object({
   name: yup.string().required("Campo obrigatório"),
@@ -82,6 +82,10 @@ const ModalBase = ({}, ref) => {
       }
     },
   }));
+
+  useEffect(() => {
+    console.log(errors);
+  }, [errors]);
 
   const [fileBlocks, setFileBlocks] = useState([{}]);
   const [uploadStatus, setUploadStatus] = useState([]);
@@ -255,7 +259,7 @@ const ModalBase = ({}, ref) => {
                       >
                         <input
                           type="file"
-                          accept=".py, .out"
+                          accept=".py, .out, .in"
                           onChange={(event) =>
                             handleFileChange(event, index, "inFile")
                           }

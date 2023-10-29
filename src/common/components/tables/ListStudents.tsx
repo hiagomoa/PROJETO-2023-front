@@ -1,20 +1,23 @@
+import { IStudent } from "@/common/interfaces/student.interface";
 import { Flex, Table, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import { ModalAluno } from "../modals/ModalAluno"; // Importe o modal correto
-import { useRef } from "react";
 
 const ListStudents = ({
   students,
   handleEditClick,
   handleDeleteConfirmation,
+  isOnClassEdit,
+}: {
+  students: IStudent[];
+  handleEditClick: (id: string) => void;
+  handleDeleteConfirmation: (id: string) => void;
+  isOnClassEdit?: boolean;
 }) => {
-  const modalAluno = useRef(); // Renomeie a ref para modalAluno
-
   return (
     <>
       <Table variant="striped" colorScheme="gray">
         <Thead>
           <Tr>
-            <Th>RA</Th>
+            {!isOnClassEdit && <Th>RA</Th>}
             <Th>Nome</Th>
             <Th colSpan={2}></Th>
           </Tr>
@@ -22,7 +25,7 @@ const ListStudents = ({
         <Tbody>
           {students?.map((student, key) => (
             <Tr key={student?.id}>
-              <Td>{student?.ra}</Td>
+              {!isOnClassEdit && <Td>{student?.ra}</Td>}
               <Td>{student?.name}</Td>
               <Td colSpan={2}>
                 <Flex justify="flex-end" gap={5}>
@@ -47,7 +50,6 @@ const ListStudents = ({
           ))}
         </Tbody>
       </Table>
-      <ModalAluno ref={modalAluno} />
     </>
   );
 };
