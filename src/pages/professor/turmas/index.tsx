@@ -8,7 +8,7 @@ import { queryClient } from "@/common/services/queryClient";
 import { withPermission } from "@/common/utils/withPermission";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 
 const Turmas = () => {
@@ -21,6 +21,10 @@ const Turmas = () => {
     ["classes", { id: session?.user?.id, role: session?.user?.role }],
     listClass
   );
+
+  useEffect(() => {
+    console.log(classes);
+  }, [classes]);
 
   const handleDeleteConfirmation = (id) => {
     modaldelete?.current.open(

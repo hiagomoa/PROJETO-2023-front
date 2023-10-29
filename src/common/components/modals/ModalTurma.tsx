@@ -4,8 +4,8 @@ import {
   getClassById,
   updateClass,
 } from "@/common/services/database/class";
-import { deleteStudent } from "@/common/services/database/student";
 import { queryClient } from "@/common/services/queryClient";
+import { API_HOST } from "@/common/utils/config";
 import {
   Box,
   Button,
@@ -113,7 +113,9 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
     modalDelete?.current.open(
       "Tem certeza de que deseja excluir está classe?",
       async () => {
-        await deleteStudent.mutateAsync(id);
+        await fetch(API_HOST + "/student/" + id, {
+          method: "DELETE",
+        }).then((r) => toast.success("Aluno excluído com sucesso!"));
         queryClient.invalidateQueries("classes");
       }
     );
