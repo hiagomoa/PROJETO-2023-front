@@ -1,12 +1,49 @@
+import { API_HOST } from "@/common/utils/config";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { AuthContext } from "@/context/auth.context";
 import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { ModalProfessor } from "../modals/ModalProfessor";
 import { Container } from "./Container";
 
 export const LayoutAlunos = ({ children }) => {
   const { user, signOut } = useContext(AuthContext);
+  const methods = useForm();
+
+  async function handleChangePassword(data: any) {
+    const payload = {
+      ...data,
+      userID: user.id,
+    };
+
+    await fetch(
+      API_HOST +
+        `/auth/change-password/?last=${payload.lastPassword}&new=${payload.newPassword}&confirmation=${payload.confirmationPassword}&user=${user.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    ).then((r) =>
+      r.status === 200
+        ? toast.success("Senha alterada com sucesso!")
+        : toast.error("Erro ao alterar senha")
+    );
+  }
+  const [open, setOpen] = useState(false);
   return (
     <Box>
       <Box bg="blueglobal" color="white">
@@ -21,9 +58,71 @@ export const LayoutAlunos = ({ children }) => {
                     <Text fontSize="sm">{user?.name} </Text>
                     <Text fontSize="sm">RA: 1865658</Text>
                   </Box>
+                  <Dialog open={open} modal onOpenChange={setOpen}>
+                    <DialogTrigger
+                      onClick={() => setOpen(!open)}
+                      className="text-sm"
+                    >
+                      TROCAR SENHA
+                    </DialogTrigger>
+                    <form
+                      className="flex items-center justify-center"
+                      {...methods}
+                      onSubmit={methods.handleSubmit(handleChangePassword)}
+                    >
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="flex justify-between items-center">
+                            Trocar senha
+                          </DialogTitle>
+                        </DialogHeader>
+
+                        <div>
+                          <Label>Senha antiga</Label>
+                          <Input
+                            {...methods.register("lastPassword")}
+                            className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                            type="password"
+                          />
+                        </div>
+                        <div>
+                          <Label>Nova senha</Label>
+                          <Input
+                            {...methods.register("newPassword")}
+                            className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                            type="password"
+                          />
+                        </div>
+                        <div>
+                          <Label>Repita a nova senha</Label>
+                          <Input
+                            {...methods.register("confirmationPassword")}
+                            className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                            type="password"
+                          />
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="ghost">Cancel</Button>
+                          </DialogClose>
+                          <Button
+                            type="submit"
+                            onClick={() => {
+                              methods.handleSubmit(handleChangePassword);
+                              setOpen(false);
+                            }}
+                            className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
+                          >
+                            Alterar senha
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </form>
+                  </Dialog>
                 </Flex>
               </Flex>
             </Box>
+
             <Box>
               <Flex alignItems="center" h="100%">
                 <Text as="button" onClick={() => signOut()}>
@@ -41,7 +140,32 @@ export const LayoutAlunos = ({ children }) => {
 
 export const LayoutAdm = ({ children }) => {
   const { signOut, user } = useContext(AuthContext);
+  console.log(user);
   const modalprofessor = useRef();
+
+  const methods = useForm();
+  const { register, handleSubmit } = methods;
+
+  async function handleChangePassword(data: any) {
+    const payload = {
+      ...data,
+      userID: user.id,
+    };
+
+    await fetch(
+      API_HOST +
+        `/auth/change-password/?last=${payload.lastPassword}&new=${payload.newPassword}&confirmation=${payload.confirmationPassword}&user=${user.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    ).then((r) =>
+      r.status === 200
+        ? toast.success("Senha alterada com sucesso!")
+        : toast.error("Erro ao alterar senha")
+    );
+  }
+  const [open, setOpen] = useState(false);
   return (
     <Box>
       <Box bg="grayglobal" color="white">
@@ -61,6 +185,64 @@ export const LayoutAdm = ({ children }) => {
                 </Text>
               </Flex>
             </Box>
+            <Dialog open={open} modal onOpenChange={setOpen}>
+              <DialogTrigger onClick={() => setOpen(!open)} className="text-sm">
+                TROCAR SENHA
+              </DialogTrigger>
+              <form
+                className="flex items-center justify-center"
+                {...methods}
+                onSubmit={methods.handleSubmit(handleChangePassword)}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex justify-between items-center">
+                      Trocar senha
+                    </DialogTitle>
+                  </DialogHeader>
+
+                  <div>
+                    <Label>Senha antiga</Label>
+                    <Input
+                      {...methods.register("lastPassword")}
+                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                      type="password"
+                    />
+                  </div>
+                  <div>
+                    <Label>Nova senha</Label>
+                    <Input
+                      {...methods.register("newPassword")}
+                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                      type="password"
+                    />
+                  </div>
+                  <div>
+                    <Label>Repita a nova senha</Label>
+                    <Input
+                      {...methods.register("confirmationPassword")}
+                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                      type="password"
+                    />
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="ghost">Cancel</Button>
+                    </DialogClose>
+                    <Button
+                      type="submit"
+                      onClick={() => {
+                        methods.handleSubmit(handleChangePassword);
+                        setOpen(false);
+                      }}
+                      className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
+                    >
+                      Alterar senha
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </form>
+            </Dialog>
             <Box>
               <Flex alignItems="center" h="100%">
                 <Text as="button" onClick={() => signOut()}>
@@ -80,6 +262,31 @@ export const LayoutAdm = ({ children }) => {
 export const LayoutProfessor = ({ children }) => {
   const { signOut, user } = useContext(AuthContext);
   const router = useRouter();
+  const methods = useForm();
+
+  async function handleChangePassword(data: any) {
+    const payload = {
+      lastPassword: data.lastPassword,
+      newPassword: data.newPassword,
+      confirmationPassword: data.confirmationPassword,
+      userID: user.id,
+    };
+
+    await fetch(
+      API_HOST +
+        `/auth/change-password/?last=${payload.lastPassword}&new=${payload.newPassword}&confirmation=${payload.confirmationPassword}&user=${user.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    ).then((r) =>
+      r.status === 200
+        ? toast.success("Senha alterada com sucesso!")
+        : toast.error("Erro ao alterar senha")
+    );
+  }
+
+  const [open, setOpen] = useState(false);
   return (
     <Box>
       <Box bg="greenglobal" color="white">
@@ -114,6 +321,68 @@ export const LayoutProfessor = ({ children }) => {
               >
                 ALUNOS
               </Text>
+
+              <Dialog open={open} modal onOpenChange={setOpen}>
+                <DialogTrigger
+                  onClick={() => setOpen(!open)}
+                  className="text-sm"
+                >
+                  TROCAR SENHA
+                </DialogTrigger>
+                <form
+                  className="flex items-center justify-center"
+                  {...methods}
+                  onSubmit={methods.handleSubmit(handleChangePassword)}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle className="flex justify-between items-center">
+                        Trocar senha
+                      </DialogTitle>
+                    </DialogHeader>
+
+                    <div>
+                      <Label>Senha antiga</Label>
+                      <Input
+                        {...methods.register("lastPassword")}
+                        className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                        type="password"
+                      />
+                    </div>
+                    <div>
+                      <Label>Nova senha</Label>
+                      <Input
+                        {...methods.register("newPassword")}
+                        className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                        type="password"
+                      />
+                    </div>
+                    <div>
+                      <Label>Repita a nova senha</Label>
+                      <Input
+                        {...methods.register("confirmationPassword")}
+                        className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
+                        type="password"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button variant="ghost">Cancel</Button>
+                      </DialogClose>
+                      <Button
+                        type="submit"
+                        onClick={() => {
+                          methods.handleSubmit(handleChangePassword);
+                          setOpen(false);
+                        }}
+                        className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
+                      >
+                        Alterar senha
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </form>
+              </Dialog>
             </Flex>
             <Box>
               <Flex alignItems="center" h="100%">

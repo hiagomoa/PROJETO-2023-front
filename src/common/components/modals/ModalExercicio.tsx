@@ -163,6 +163,8 @@ const ModalBase = ({}, ref) => {
       data.classId = data?.classId?.id;
       data.professorId = user?.id;
 
+      console.log(data);
+
       const result = await create
         .mutateAsync(data, {
           onSuccess: () => {
@@ -174,6 +176,7 @@ const ModalBase = ({}, ref) => {
         .then(async (item) => {
           await Promise.all(
             fileBlocks.map(async (f, i) => {
+              console.log(i, item, "asodihnasiudbuaysbdyuasbdyu", f);
               await uploadFile(i, item.id);
             })
           );

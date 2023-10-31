@@ -1,8 +1,8 @@
-//import "@/styles/globals.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
 import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
+import "../styles/globals.css";
 import theme from "../styles/theme/theme";
 
 import { AuthProvider } from "@/context/auth.context";

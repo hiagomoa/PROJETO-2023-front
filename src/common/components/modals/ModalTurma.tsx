@@ -1,3 +1,4 @@
+import { AuthContext } from "@/context/auth.context";
 import {
   Box,
   Button,
@@ -15,8 +16,13 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useSession } from "next-auth/react";
-import { Ref, forwardRef, useImperativeHandle, useRef } from "react";
+import {
+  Ref,
+  forwardRef,
+  useContext,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
@@ -46,8 +52,6 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
   const create = useMutation(createClass);
   const updated = useMutation(updateClass);
 
-  const { data: session } = useSession();
-
   const {
     control,
     register,
@@ -59,6 +63,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
   } = useForm<IClass | any>({
     resolver: yupResolver(schema),
   });
+  const { user } = useContext(AuthContext);
 
   const id = watch("id");
   const onSubmit = async (data) => {
@@ -71,7 +76,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
         },
       });
     } else {
-      data.professorId = session?.user?.id;
+      data.professorId = user?.id;
       await create.mutateAsync(data, {
         onSuccess: () => {
           toast.success("Turma cadastrada com sucesso!");

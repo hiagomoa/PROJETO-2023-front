@@ -24,7 +24,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .then((res) => res.json())
       .then((data) => {
         cookies.set("token", data.token, { expires: 60 * 60 });
-        setUser(data);
+        cookies.set("role", data.user.role, { expires: 60 * 60 });
+        console.log(data);
+        setUser(data.user);
 
         if (data.user.role === "PROFESSOR") {
           router.push("/professor");
@@ -46,37 +48,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     cookies.remove("token");
     setUser(null);
 
-    router.push("/");
+    setTimeout(() => {
+      router.push("/");
+    }, 300);
   }
 
   async function refreshToken() {
     const token = cookies.get("token");
-    const newJWT = await fetch(API_HOST + "/auth/refresh", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const newJWT = await fetch(API_HOST + "/auth/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
 
-    const newJWTData = await newJWT.json();
+      const newJWTData = await newJWT.json();
 
-    cookies.set("token", newJWTData.token, {
-      expires: 60 * 60,
-    });
+      cookies.set("token", newJWTData.token, {
+        expires: 60 * 60,
+      });
+      cookies.set("role", newJWTData.user.role, {
+        expires: 60 * 60,
+      });
 
-    setUser(newJWTData.user);
+      setUser(newJWTData.user);
 
-    if (newJWTData.user.role === "PROFESSOR") {
-      router.push("/professor");
-    }
+      if (newJWTData.user.role === "PROFESSOR") {
+        router.push("/professor");
+      }
 
-    if (newJWTData.user.role === "STUDENT") {
-      router.push("/aluno");
-    }
+      if (newJWTData.user.role === "STUDENT") {
+        router.push("/aluno");
+      }
 
-    if (newJWTData.user.role === "ADMIN") {
-      router.push("/adm");
+      if (newJWTData.user.role === "ADMIN") {
+        router.push("/adm");
+      }
+    } catch (err) {
+      cookies.remove("token");
+      cookies.remove("role");
+      setUser(null);
+      router.push("/");
     }
   }
 

@@ -1,7 +1,7 @@
+import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { Exercise, ProfessorContext } from "../../../context/professor.context";
@@ -26,7 +26,7 @@ const ListExercises = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const [props, setProps] = useState<IProps>();
   const {
     handleSelectExercise,
@@ -48,7 +48,7 @@ const ListExercises = ({
       // @ts-ignore
       axios
         .post(`${API_HOST}/answer/out-put`, {
-          studentId: session?.user?.id,
+          studentId: user?.id,
           exerciseId: exercise.id,
         })
         .then((r) => {
@@ -119,9 +119,8 @@ const ListExercises = ({
       formData.append("file", file);
       try {
         // @ts-ignore
-        console.log(session?.user.id);
         await axios.post(
-          `${API_HOST}/upload?entity=studentAnswer&studentId=${session?.user?.id}&exerciseId=${props?.exCurrent?.id}`,
+          `${API_HOST}/upload?entity=studentAnswer&studentId=${user?.id}&exerciseId=${props?.exCurrent?.id}`,
           formData,
           {
             headers: {
@@ -516,25 +515,26 @@ const ListExercises = ({
       >
         <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
           {data?.length === 0 && <Text>Nenhum exercício encontrado</Text>}
-          {data?.map((exercise: Exercise, key: number) => (
-            <GridItem
-              key={key}
-              onClick={() => {
-                handleSelectExercise(exercise), updateModal(exercise);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <CardExercicios
-                name={exercise?.name}
-                description={exercise?.description}
-                date={formatDateTime(
-                  new Date(exercise?.dueDate.split(":00.")[0])
-                )}
-                maxAttempts={exercise?.maxAttempts}
-                myClass={exercise?.class.name}
-              />
-            </GridItem>
-          ))}
+          {data &&
+            data?.map((exercise: Exercise, key: number) => (
+              <GridItem
+                key={key}
+                onClick={() => {
+                  handleSelectExercise(exercise), updateModal(exercise);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <CardExercicios
+                  name={exercise?.name}
+                  description={exercise?.description}
+                  date={formatDateTime(
+                    new Date(exercise?.dueDate.split(":00.")[0])
+                  )}
+                  maxAttempts={exercise?.maxAttempts}
+                  myClass={exercise?.class.name}
+                />
+              </GridItem>
+            ))}
         </Grid>
       </Box>
     </>

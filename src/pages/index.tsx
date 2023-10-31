@@ -1,5 +1,6 @@
 import { FormInput } from "@/common/components/inputs/FormInput";
 import { Container } from "@/common/components/layout/Container";
+import { API_HOST } from "@/common/utils/config";
 import { getRedirectUrl } from "@/common/utils/getRedirectUrl";
 import { AuthContext } from "@/context/auth.context";
 import {
@@ -13,9 +14,11 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import * as yup from "yup";
 
 const schema = yup.object().shape({
@@ -48,10 +51,26 @@ const Index = () => {
     resolver: yupResolver(schema),
   });
 
+  const forgotMethods = useForm({});
+  const [result, setResult] = useState("");
+
   const onSubmit = async (data: { email: string; password: string }) => {
     console.log(data);
     await signIn(data.email, data.password);
   };
+
+  const handleForgotPassword = async (data: { email: string }) => {
+    await fetch(API_HOST + "/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email }),
+    }).then((res) =>
+      res.status === 200
+        ? (toast.success("Email enviado com sucesso!"), setTabIndex(0))
+        : toast.error("Email não encontrado!")
+    );
+  };
+
   return (
     <>
       <Flex bg="blueglobal" h="100vh" alignItems="center">
@@ -68,6 +87,14 @@ const Index = () => {
               borderBottomRightRadius="30px"
               p={5}
             >
+              {tabIndex === 1 && (
+                <button
+                  className="appearence-none"
+                  onClick={() => setTabIndex(0)}
+                >
+                  <ArrowLeftIcon className="w-8 h-8 " />
+                </button>
+              )}
               <Flex alignItems="center" h="100%" justify="center">
                 <Box w="80%">
                   <Tabs index={tabIndex}>
@@ -95,7 +122,19 @@ const Index = () => {
                               error={errors.password?.message}
                             />
                             <Flex justify="flex-end">
-                              <Text fontWeight="bold">Esqueceu sua senha?</Text>
+                              <Button
+                                background="transparent"
+                                onClick={() => setTabIndex(1)}
+                                sx={{
+                                  _hover: {
+                                    background: "transparent",
+                                    color: "#319795",
+                                  },
+                                }}
+                                fontWeight="bold"
+                              >
+                                Esqueceu sua senha?
+                              </Button>
                             </Flex>
                             <Button
                               bg="#319795"
@@ -111,19 +150,35 @@ const Index = () => {
                         </form>
                       </TabPanel>
                       <TabPanel>
-                        <Box display="grid" gap={5}>
-                          <Text
-                            fontWeight="bold"
-                            fontSize="3xl"
-                            color="#555555"
-                          >
-                            ESQUECEU SUA SENHA?
-                          </Text>
-                          <FormInput placeholder="Email do cadastro" />
-                          <Button bg="#319795" w="max" color="white" px={10}>
-                            Recuperar a senha
-                          </Button>
-                        </Box>
+                        <form
+                          {...forgotMethods}
+                          onSubmit={forgotMethods.handleSubmit(
+                            handleForgotPassword
+                          )}
+                        >
+                          <Box display="grid" h="100%" gap={5}>
+                            <Text
+                              fontWeight="bold"
+                              fontSize="3xl"
+                              color="#555555"
+                            >
+                              ESQUECEU SUA SENHA?
+                            </Text>
+                            <FormInput
+                              {...forgotMethods.register("email")}
+                              placeholder="Email do cadastro"
+                            />
+                            <Button
+                              bg="#319795"
+                              w="max"
+                              color="white"
+                              type="submit"
+                              px={10}
+                            >
+                              Recuperar a senha
+                            </Button>
+                          </Box>
+                        </form>
                       </TabPanel>
                     </TabPanels>
                   </Tabs>

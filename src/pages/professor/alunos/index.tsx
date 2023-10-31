@@ -1,6 +1,6 @@
+import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 import { Container } from "../../../common/components/layout/Container";
 import { LayoutProfessor } from "../../../common/components/layout/Layout";
@@ -18,12 +18,15 @@ const ProfessorAlunos = () => {
   const modaldelete = useRef();
   const deleteStudents = useMutation(deleteStudent);
 
-  const { data: session } = useSession();
-
+  const { user } = useContext(AuthContext);
   const { data: students, isLoading } = useQuery(
-    ["students", { id: session?.user?.id, role: session?.user?.role }],
+    ["students", { id: user?.id, role: user?.role }],
     listStudents
   );
+
+  useEffect(() => {
+    console.log(students);
+  }, [students]);
 
   const handleDeleteConfirmation = (studentId) => {
     modaldelete?.current.open(

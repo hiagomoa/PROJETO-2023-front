@@ -5,11 +5,11 @@ import ListExercises from "@/common/components/tables/ListExercise";
 import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
 import { API_HOST } from "@/common/utils/config";
+import { AuthContext } from "@/context/auth.context";
 import { Exercise } from "@/context/professor.context";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import * as yup from "yup";
@@ -32,23 +32,23 @@ const Alunos = () => {
     resolver: yupResolver(schema),
   });
 
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const [selectedClassId, setSelectedClassId] = useState(null);
   const { data: classes } = useQuery(
-    ["classes", { id: session?.user?.id, role: session?.user?.role }],
+    ["classes", { id: user?.id, role: user?.role }],
     listClass
   );
 
-  const [exercises, setExercises] = useState([]);
-  useEffect(() => {
-    console.log(exercises);
-  }, [exercises]);
+  console.log(classes, "classes");
+
   const handleSelect = async (id: string) => {
-    await fetch(`${API_HOST}/exercise`, {
+    await fetch(`${API_HOST}/exercise/${id}`, {
       method: "GET",
     })
       .then((response) => response.json())
-      .then((data) => setExercises(data));
+      .then((data) => {
+        setSelectedClassId(data.classId);
+      });
   };
 
   const { data: exercise } = useQuery(
@@ -56,8 +56,8 @@ const Alunos = () => {
       "exercise",
       {
         classId: selectedClassId,
-        id: session?.user?.id,
-        role: session?.user?.role,
+        id: user?.id,
+        role: user?.role,
       },
     ],
     listExercises
@@ -68,31 +68,36 @@ const Alunos = () => {
   const [duePast, setDuePast] = useState<Exercise[]>();
 
   useEffect(() => {
-    const dueToday = exercise?.filter((item: any, i: number) => {
-      let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+    console.log(exercise, "exercise");
+    const dueToday =
+      exercise &&
+      exercise?.filter((item: any, i: number) => {
+        let dueDate = new Date(item?.dueDate.split(":00.")[0]);
 
-      if (
-        dueDate.getDay() < new Date().getDay() &&
-        dueDate.getMonth() <= new Date().getMonth() &&
-        dueDate.getFullYear() <= new Date().getFullYear()
-      ) {
-        return item;
-      }
-    });
+        if (
+          dueDate.getDay() < new Date().getDay() &&
+          dueDate.getMonth() <= new Date().getMonth() &&
+          dueDate.getFullYear() <= new Date().getFullYear()
+        ) {
+          return item;
+        }
+      });
 
-    const dueLater = exercise?.filter((item: any, i: number) => {
-      console.log(item);
+    const dueLater =
+      exercise &&
+      exercise?.filter((item: any, i: number) => {
+        console.log(item);
 
-      const dueDate = new Date(item?.dueDate.split(":00.")[0]);
+        const dueDate = new Date(item?.dueDate.split(":00.")[0]);
 
-      if (
-        dueDate.getDay() >= new Date().getDay() &&
-        dueDate.getMonth() >= new Date().getMonth() &&
-        dueDate.getFullYear() >= new Date().getFullYear()
-      ) {
-        return item;
-      }
-    });
+        if (
+          dueDate.getDay() >= new Date().getDay() &&
+          dueDate.getMonth() >= new Date().getMonth() &&
+          dueDate.getFullYear() >= new Date().getFullYear()
+        ) {
+          return item;
+        }
+      });
 
     // const duePast = exercise?.data.filter((item: any, i: number) => {
     //   let dueDate = new Date(item?.dueDate.split(":00.")[0]);
@@ -143,7 +148,6 @@ const Alunos = () => {
                       getOptionLabel={(option: any) => option.name}
                       error={errors.classId?.message}
                       onChange={(selectedOption) => {
-                        console.log(selectedOption.id);
                         handleSelect(selectedOption.id);
                       }}
                     />

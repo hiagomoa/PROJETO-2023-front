@@ -1,7 +1,10 @@
-import React, { forwardRef, useImperativeHandle } from "react";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import {
+  createProf,
+  getProfById,
+  updateProf,
+} from "@/common/services/database/professor";
+import { queryClient } from "@/common/services/queryClient";
+import { AuthContext } from "@/context/auth.context";
 import {
   Box,
   Button,
@@ -15,16 +18,13 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { forwardRef, useContext, useImperativeHandle } from "react";
+import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
-import {
-  createProf,
-  getProfById,
-  updateProf,
-} from "@/common/services/database/professor";
-import { queryClient } from "@/common/services/queryClient";
 import { toast } from "react-toastify";
+import * as yup from "yup";
 import { FormInput } from "../inputs/FormInput";
-import { useSession } from "next-auth/react";
 
 const schema = yup.object({
   name: yup.string().required("Campo obrigatório"),
@@ -37,7 +37,7 @@ const ModalBase = ({}, ref) => {
   const getById = useMutation(getProfById);
   const create = useMutation(createProf);
   const updated = useMutation(updateProf);
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
 
   const {
     control,
@@ -59,7 +59,7 @@ const ModalBase = ({}, ref) => {
         },
       });
     } else {
-      data.administratorId = session?.user.id;
+      data.administratorId = user.id;
       await create.mutateAsync(data, {
         onSuccess: () => {
           toast.success("Professor cadastrado com sucesso!");
