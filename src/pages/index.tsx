@@ -1,5 +1,7 @@
 import { FormInput } from "@/common/components/inputs/FormInput";
 import { Container } from "@/common/components/layout/Container";
+import { getRedirectUrl } from "@/common/utils/getRedirectUrl";
+import { AuthContext } from "@/context/auth.context";
 import {
   Box,
   Button,
@@ -10,14 +12,11 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "react-toastify";
-import { getRedirectUrl } from "@/common/utils/getRedirectUrl";
-import { useRouter } from "next/router";
 
 const schema = yup.object().shape({
   email: yup.string().email("Email inválido").required("Campo obrigatório"),
@@ -26,20 +25,20 @@ const schema = yup.object().shape({
 
 const Index = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  const { data: session } = useSession();
+  const { signIn, user } = useContext(AuthContext);
 
   const router = useRouter();
 
   useEffect(() => {
     const checkRedirect = async () => {
-      if (session) {
-        const url = await getRedirectUrl(session?.user?.role);
+      if (user) {
+        const url = await getRedirectUrl(user?.role);
         router.replace(url);
       }
     };
 
     checkRedirect();
-  }, [session, router]);
+  }, [user, router]);
 
   const {
     register,
@@ -49,27 +48,9 @@ const Index = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async (data: any) => {
-    try {
-      const result = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        callbackUrl: "/",
-        redirect: false,
-      });
-
-      if (result?.error) {
-        toast.error("Erro ao fazer login. Verifique suas credenciais.");
-      } else if (result?.status === 200) {
-        toast.success("Login bem-sucedido!");
-      } else {
-      }
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      toast.error(
-        "Ocorreu um erro ao fazer login. Tente novamente mais tarde."
-      );
-    }
+  const onSubmit = async (data: { email: string; password: string }) => {
+    console.log(data);
+    await signIn(data.email, data.password);
   };
   return (
     <>

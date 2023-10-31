@@ -1136,6 +1136,11 @@
     "@types/react" "*"
     immutable "~3.7.4"
 
+"@types/js-cookie@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.npmjs.org/@types/js-cookie/-/js-cookie-3.0.5.tgz"
+  integrity sha512-dtLshqoiGRDHbHueIT9sjkd2F4tW1qPSX2xKAQK8p1e6pM+Z913GM1shv7dOqqasEMYbC5zEaClJomQe8OtQLA==
+
 "@types/json5@^0.0.29":
   version "0.0.29"
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
@@ -2734,6 +2739,11 @@ jose@^4.11.4, jose@^4.14.4:
   version "4.14.6"
   resolved "https://registry.npmjs.org/jose/-/jose-4.14.6.tgz"
   integrity sha512-EqJPEUlZD0/CSUMubKtMaYUOtWe91tZXTWMJZoKSbLk+KtdhNdcvppH8lA9XwVu2V4Ailvsj0GBZJ2ZwDjfesQ==
+
+js-cookie@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.npmjs.org/js-cookie/-/js-cookie-3.0.5.tgz"
+  integrity sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==
 
 js-sha3@0.8.0:
   version "0.8.0"

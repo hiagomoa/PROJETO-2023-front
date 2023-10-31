@@ -1,15 +1,15 @@
 //import "@/styles/globals.css";
-import theme from "@/styles/theme/theme";
 import { ChakraProvider } from "@chakra-ui/react";
-import { SessionProvider } from "next-auth/react";
 import type { AppProps } from "next/app";
 import { QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
+import theme from "../styles/theme/theme";
 
-import { queryClient } from "@/common/services/queryClient";
-import { ProfessorProvider } from "@/context/professor.context";
+import { AuthProvider } from "@/context/auth.context";
 import { useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { queryClient } from "../common/services/queryClient";
+import { ProfessorProvider } from "../context/professor.context";
 
 export default function App({
   Component,
@@ -19,7 +19,7 @@ export default function App({
     console.log(process.env.HOST_URL);
   }, []);
   return (
-    <>
+    <AuthProvider>
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -35,12 +35,10 @@ export default function App({
       <ProfessorProvider>
         <QueryClientProvider client={queryClient}>
           <ChakraProvider theme={theme}>
-            <SessionProvider session={session}>
-              <Component {...pageProps} />
-            </SessionProvider>
+            <Component {...pageProps} />
           </ChakraProvider>
         </QueryClientProvider>
       </ProfessorProvider>
-    </>
+    </AuthProvider>
   );
 }

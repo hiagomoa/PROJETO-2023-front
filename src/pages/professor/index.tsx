@@ -77,9 +77,12 @@ const Professor = () => {
                     placeholder="Turma"
                     options={[
                       { id: null, name: "Todas as Turmas" }, // Opção para limpar o filtro
-                      ...(classes?.data || []),
+                      ...(classes || []),
                     ]}
-                    getOptionValue={(option: any) => option.id}
+                    getOptionValue={(option: any) => {
+                      console.log(option.id);
+                      return option.id;
+                    }}
                     getOptionLabel={(option: any) => option.name}
                     error={errors.classId?.message}
                     onChange={(selectedOption) =>
@@ -98,7 +101,7 @@ const Professor = () => {
             </Button>
           </Flex>
 
-          <ListExercises scope="prof" data={exercise?.data} />
+          <ListExercises scope="prof" data={exercise} />
         </Box>
       </Container>
       <ModalExercicio ref={modalexercicio} />

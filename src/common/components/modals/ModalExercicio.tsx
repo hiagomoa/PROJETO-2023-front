@@ -1,11 +1,4 @@
-import { listClass } from "@/common/services/database/class";
-import {
-  createExercise,
-  getExerciseById,
-  updateExercise,
-} from "@/common/services/database/exercicio";
-import { queryClient } from "@/common/services/queryClient";
-import { API_HOST } from "@/common/utils/config";
+import { AuthContext } from "@/context/auth.context";
 import {
   Box,
   Button,
@@ -22,13 +15,26 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusCircle, Trash } from "@phosphor-icons/react";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import { listClass } from "../../services/database/class";
+import {
+  createExercise,
+  getExerciseById,
+  updateExercise,
+} from "../../services/database/exercicio";
+import { queryClient } from "../../services/queryClient";
+import { API_HOST } from "../../utils/config";
 import { FormDate } from "../inputs/FormDate"; // Importe o componente FormDate corretamente
 import { FormInput } from "../inputs/FormInput";
 import { FormMultiSelect } from "../inputs/FormMultiSelect";
@@ -51,9 +57,9 @@ const ModalBase = ({}, ref) => {
   const getById = useMutation(getExerciseById);
   const create = useMutation(createExercise);
   const updated = useMutation(updateExercise);
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const { data: classes } = useQuery(
-    ["classes", { id: session?.user?.id, role: session?.user?.role }],
+    ["classes", { id: user?.id, role: user?.role }],
     listClass
   );
 
@@ -155,7 +161,7 @@ const ModalBase = ({}, ref) => {
       });
     } else {
       data.classId = data?.classId?.id;
-      data.professorId = session?.user?.id;
+      data.professorId = user?.id;
 
       const result = await create
         .mutateAsync(data, {
@@ -208,7 +214,7 @@ const ModalBase = ({}, ref) => {
                       required
                       placeholder="Turma"
                       label="Turma"
-                      options={classes?.data}
+                      options={classes}
                       getOptionValue={(option: any) => option.id}
                       getOptionLabel={(option: any) => option.name}
                       error={errors.classId?.message}
@@ -259,7 +265,7 @@ const ModalBase = ({}, ref) => {
                       >
                         <input
                           type="file"
-                          accept=".py, .out, .in"
+                          accept=".in"
                           onChange={(event) =>
                             handleFileChange(event, index, "inFile")
                           }
@@ -277,7 +283,7 @@ const ModalBase = ({}, ref) => {
                       >
                         <input
                           type="file"
-                          accept=".py, .out"
+                          accept=".out"
                           onChange={(event) =>
                             handleFileChange(event, index, "outFile")
                           }

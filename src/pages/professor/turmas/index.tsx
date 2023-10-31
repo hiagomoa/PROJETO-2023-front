@@ -1,15 +1,17 @@
-import { Container } from "@/common/components/layout/Container";
-import { LayoutProfessor } from "@/common/components/layout/Layout";
-import { ModalDelete } from "@/common/components/modals/ModalDelete";
-import { ModalTurma } from "@/common/components/modals/ModalTurma";
-import ListClass from "@/common/components/tables/ListClass";
-import { deleteClass, listClass } from "@/common/services/database/class";
-import { queryClient } from "@/common/services/queryClient";
-import { withPermission } from "@/common/utils/withPermission";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
+import { Container } from "../../../common/components/layout/Container";
+import { LayoutProfessor } from "../../../common/components/layout/Layout";
+import { ModalDelete } from "../../../common/components/modals/ModalDelete";
+import { ModalTurma } from "../../../common/components/modals/ModalTurma";
+import ListClass from "../../../common/components/tables/ListClass";
+import {
+  deleteClass,
+  listClass,
+} from "../../../common/services/database/class";
+import { queryClient } from "../../../common/services/queryClient";
 
 const Turmas = () => {
   const modalturmas = useRef();
@@ -58,7 +60,7 @@ const Turmas = () => {
           </Flex>
         </Box>
         <ListClass
-          classes={classes?.data}
+          classes={classes}
           handleDeleteConfirmation={handleDeleteConfirmation}
           handleEditClick={handleEditClick}
         />
@@ -69,9 +71,3 @@ const Turmas = () => {
   );
 };
 export default Turmas;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "PROFESSOR");

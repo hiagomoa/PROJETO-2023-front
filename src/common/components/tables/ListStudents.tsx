@@ -23,31 +23,34 @@ const ListStudents = ({
           </Tr>
         </Thead>
         <Tbody>
-          {students?.map((student, key) => (
-            <Tr key={student?.id}>
-              {!isOnClassEdit && <Td>{student?.ra}</Td>}
-              <Td>{student?.name}</Td>
-              <Td colSpan={2}>
-                <Flex justify="flex-end" gap={5}>
-                  <Text
-                    as="button"
-                    fontWeight="bold"
-                    onClick={() => handleEditClick(student.id)}
-                  >
-                    Editar
-                  </Text>
-                  <Text
-                    as="button"
-                    color="red"
-                    fontWeight="bold"
-                    onClick={() => handleDeleteConfirmation(student.id)}
-                  >
-                    Excluir
-                  </Text>
-                </Flex>
-              </Td>
-            </Tr>
-          ))}
+          {students?.map((student, key) => {
+            if (student.deleted_at !== null) return;
+            return (
+              <Tr key={student?.id}>
+                {!isOnClassEdit && <Td>{student?.ra}</Td>}
+                <Td>{student?.name}</Td>
+                <Td colSpan={2}>
+                  <Flex justify="flex-end" gap={5}>
+                    <Text
+                      as="button"
+                      fontWeight="bold"
+                      onClick={() => handleEditClick(student.id)}
+                    >
+                      Editar
+                    </Text>
+                    <Text
+                      as="button"
+                      color="red"
+                      fontWeight="bold"
+                      onClick={() => handleDeleteConfirmation(student.id)}
+                    >
+                      Excluir
+                    </Text>
+                  </Flex>
+                </Td>
+              </Tr>
+            );
+          })}
         </Tbody>
       </Table>
     </>

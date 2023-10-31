@@ -1,12 +1,12 @@
+import { AuthContext } from "@/context/auth.context";
 import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
-import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { ModalProfessor } from "../modals/ModalProfessor";
 import { Container } from "./Container";
 
 export const LayoutAlunos = ({ children }) => {
-  const { data: session } = useSession();
+  const { user, signOut } = useContext(AuthContext);
   return (
     <Box>
       <Box bg="blueglobal" color="white">
@@ -15,10 +15,10 @@ export const LayoutAlunos = ({ children }) => {
             <Box>
               <Flex alignItems="center" gap={10}>
                 <Flex gap={3} alignItems="center">
-                  <Avatar name={String(session?.user?.name)} />
+                  <Avatar name={String(user?.name)} />
                   <Box>
                     <Text fontSize="sm">Engenharia de Computação</Text>
-                    <Text fontSize="sm">{session?.user?.name} </Text>
+                    <Text fontSize="sm">{user?.name} </Text>
                     <Text fontSize="sm">RA: 1865658</Text>
                   </Box>
                 </Flex>
@@ -40,7 +40,7 @@ export const LayoutAlunos = ({ children }) => {
 };
 
 export const LayoutAdm = ({ children }) => {
-  const { data: session } = useSession();
+  const { signOut, user } = useContext(AuthContext);
   const modalprofessor = useRef();
   return (
     <Box>
@@ -50,8 +50,8 @@ export const LayoutAdm = ({ children }) => {
             <Box>
               <Flex alignItems="center" gap={10}>
                 <Flex gap={3} alignItems="center">
-                  <Avatar name={String(session?.user?.name)} />
-                  <Text>{session?.user?.name}</Text>
+                  <Avatar name={String(user?.name)} />
+                  <Text>{user?.name}</Text>
                 </Flex>
                 <Text
                   as="button"
@@ -78,7 +78,7 @@ export const LayoutAdm = ({ children }) => {
 };
 
 export const LayoutProfessor = ({ children }) => {
-  const { data: session } = useSession();
+  const { signOut, user } = useContext(AuthContext);
   const router = useRouter();
   return (
     <Box>
@@ -87,8 +87,8 @@ export const LayoutProfessor = ({ children }) => {
           <Flex justify="space-between" p={3}>
             <Box>
               <Flex gap={3} alignItems="center">
-                <Avatar name={String(session?.user?.name)} />
-                <Text>{session?.user?.name}</Text>
+                <Avatar name={String(user?.name)} />
+                <Text>{user?.name}</Text>
               </Flex>
             </Box>
 

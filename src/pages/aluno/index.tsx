@@ -4,7 +4,7 @@ import { LayoutAlunos } from "@/common/components/layout/Layout";
 import ListExercises from "@/common/components/tables/ListExercise";
 import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
-import { withPermission } from "@/common/utils/withPermission";
+import { API_HOST } from "@/common/utils/config";
 import { Exercise } from "@/context/professor.context";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -39,6 +39,18 @@ const Alunos = () => {
     listClass
   );
 
+  const [exercises, setExercises] = useState([]);
+  useEffect(() => {
+    console.log(exercises);
+  }, [exercises]);
+  const handleSelect = async (id: string) => {
+    await fetch(`${API_HOST}/exercise`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => setExercises(data));
+  };
+
   const { data: exercise } = useQuery(
     [
       "exercise",
@@ -56,7 +68,7 @@ const Alunos = () => {
   const [duePast, setDuePast] = useState<Exercise[]>();
 
   useEffect(() => {
-    const dueToday = exercise?.data.filter((item: any, i: number) => {
+    const dueToday = exercise?.filter((item: any, i: number) => {
       let dueDate = new Date(item?.dueDate.split(":00.")[0]);
 
       if (
@@ -68,7 +80,7 @@ const Alunos = () => {
       }
     });
 
-    const dueLater = exercise?.data.filter((item: any, i: number) => {
+    const dueLater = exercise?.filter((item: any, i: number) => {
       console.log(item);
 
       const dueDate = new Date(item?.dueDate.split(":00.")[0]);
@@ -125,14 +137,15 @@ const Alunos = () => {
                       placeholder="Turma"
                       options={[
                         { id: null, name: "Todas as Turmas" },
-                        ...(classes?.data || []),
+                        ...(classes || []),
                       ]}
                       getOptionValue={(option: any) => option.id}
                       getOptionLabel={(option: any) => option.name}
                       error={errors.classId?.message}
-                      onChange={(selectedOption) =>
-                        setSelectedClassId(selectedOption.id)
-                      }
+                      onChange={(selectedOption) => {
+                        console.log(selectedOption.id);
+                        handleSelect(selectedOption.id);
+                      }}
                     />
                   )}
                 />
@@ -166,9 +179,3 @@ const Alunos = () => {
   );
 };
 export default Alunos;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "STUDENT");

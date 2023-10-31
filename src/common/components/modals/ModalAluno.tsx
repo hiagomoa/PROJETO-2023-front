@@ -126,7 +126,7 @@ const ModalBase = (
                 name="classId"
                 defaultValue={
                   classId && isOnClassEdit
-                    ? classes.data.find((option) => option.id === classId)
+                    ? classes.find((option) => option.id === classId)
                     : undefined
                 }
                 control={control}
@@ -135,7 +135,7 @@ const ModalBase = (
                     {...field}
                     required
                     placeholder="Turma"
-                    options={classes.data}
+                    options={classes}
                     getOptionValue={(option: any) => option.id}
                     getOptionLabel={(option: any) => option.name}
                     error={errors.classId?.message}
