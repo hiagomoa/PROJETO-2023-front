@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         cookies.set("token", data.token, { expires: 60 * 60 });
         cookies.set("role", data.user.role, { expires: 60 * 60 });
         console.log(data);
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           router.push("/adm");
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err, "err"));
   }
   const router = useRouter();
 

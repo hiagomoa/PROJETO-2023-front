@@ -27,34 +27,35 @@ const ListProfessor = ({
           </Tr>
         </Thead>
         <Tbody>
-          {professors?.map((prof, key) => {
-            if (prof.deleted_at !== null) return;
+          {professors &&
+            professors?.map((prof, key) => {
+              if (prof.deleted_at !== null) return;
 
-            return (
-              <Tr key={prof.id}>
-                <Td>{prof.name}</Td>
-                <Td colSpan={2}>
-                  <Flex justify="flex-end" gap={5}>
-                    <Text
-                      as="button"
-                      fontWeight="bold"
-                      onClick={() => handleEditClick(prof.id)}
-                    >
-                      Editar
-                    </Text>
-                    <Text
-                      as="button"
-                      color="red"
-                      fontWeight="bold"
-                      onClick={() => handleDeleteConfirmation(prof.id)}
-                    >
-                      Excluir
-                    </Text>
-                  </Flex>
-                </Td>
-              </Tr>
-            );
-          })}
+              return (
+                <Tr key={prof.id}>
+                  <Td>{prof.name}</Td>
+                  <Td colSpan={2}>
+                    <Flex justify="flex-end" gap={5}>
+                      <Text
+                        as="button"
+                        fontWeight="bold"
+                        onClick={() => handleEditClick(prof.id)}
+                      >
+                        Editar
+                      </Text>
+                      <Text
+                        as="button"
+                        color="red"
+                        fontWeight="bold"
+                        onClick={() => handleDeleteConfirmation(prof.id)}
+                      >
+                        Excluir
+                      </Text>
+                    </Flex>
+                  </Td>
+                </Tr>
+              );
+            })}
         </Tbody>
       </Table>
     </TableContainer>

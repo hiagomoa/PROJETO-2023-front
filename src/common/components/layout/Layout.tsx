@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { AuthContext } from "@/context/auth.context";
 import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { ModalProfessor } from "../modals/ModalProfessor";
@@ -43,6 +43,19 @@ export const LayoutAlunos = ({ children }) => {
         : toast.error("Erro ao alterar senha")
     );
   }
+  const [v1, setV1] = useState("");
+  const [v2, setV2] = useState("");
+  const [v3, setV3] = useState("");
+
+  useEffect(() => {
+    console.log(v1);
+  }, [v1]);
+  useEffect(() => {
+    console.log(v2);
+  }, [v2]);
+  useEffect(() => {
+    console.log(v3);
+  }, [v3]);
   const [open, setOpen] = useState(false);
   return (
     <Box>
@@ -80,7 +93,8 @@ export const LayoutAlunos = ({ children }) => {
                         <div>
                           <Label>Senha antiga</Label>
                           <Input
-                            {...methods.register("lastPassword")}
+                            onChange={(e) => setV1(e.target.value)}
+                            value={v1}
                             className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                             type="password"
                           />
@@ -88,7 +102,8 @@ export const LayoutAlunos = ({ children }) => {
                         <div>
                           <Label>Nova senha</Label>
                           <Input
-                            {...methods.register("newPassword")}
+                            onChange={(e) => setV2(e.target.value)}
+                            value={v2}
                             className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                             type="password"
                           />
@@ -96,7 +111,8 @@ export const LayoutAlunos = ({ children }) => {
                         <div>
                           <Label>Repita a nova senha</Label>
                           <Input
-                            {...methods.register("confirmationPassword")}
+                            onChange={(e) => setV3(e.target.value)}
+                            value={v3}
                             className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                             type="password"
                           />
@@ -106,10 +122,13 @@ export const LayoutAlunos = ({ children }) => {
                             <Button variant="ghost">Cancel</Button>
                           </DialogClose>
                           <Button
-                            type="submit"
-                            onClick={() => {
-                              methods.handleSubmit(handleChangePassword);
-                              setOpen(false);
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleChangePassword({
+                                lastPassword: v1,
+                                newPassword: v2,
+                                confirmationPassword: v3,
+                              });
                             }}
                             className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
                           >
@@ -185,64 +204,7 @@ export const LayoutAdm = ({ children }) => {
                 </Text>
               </Flex>
             </Box>
-            <Dialog open={open} modal onOpenChange={setOpen}>
-              <DialogTrigger onClick={() => setOpen(!open)} className="text-sm">
-                TROCAR SENHA
-              </DialogTrigger>
-              <form
-                className="flex items-center justify-center"
-                {...methods}
-                onSubmit={methods.handleSubmit(handleChangePassword)}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="flex justify-between items-center">
-                      Trocar senha
-                    </DialogTitle>
-                  </DialogHeader>
 
-                  <div>
-                    <Label>Senha antiga</Label>
-                    <Input
-                      {...methods.register("lastPassword")}
-                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
-                      type="password"
-                    />
-                  </div>
-                  <div>
-                    <Label>Nova senha</Label>
-                    <Input
-                      {...methods.register("newPassword")}
-                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
-                      type="password"
-                    />
-                  </div>
-                  <div>
-                    <Label>Repita a nova senha</Label>
-                    <Input
-                      {...methods.register("confirmationPassword")}
-                      className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
-                      type="password"
-                    />
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="ghost">Cancel</Button>
-                    </DialogClose>
-                    <Button
-                      type="submit"
-                      onClick={() => {
-                        methods.handleSubmit(handleChangePassword);
-                        setOpen(false);
-                      }}
-                      className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
-                    >
-                      Alterar senha
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </form>
-            </Dialog>
             <Box>
               <Flex alignItems="center" h="100%">
                 <Text as="button" onClick={() => signOut()}>
@@ -262,7 +224,9 @@ export const LayoutAdm = ({ children }) => {
 export const LayoutProfessor = ({ children }) => {
   const { signOut, user } = useContext(AuthContext);
   const router = useRouter();
-  const methods = useForm();
+  const methods = useForm({
+    mode: "onChange",
+  });
 
   async function handleChangePassword(data: any) {
     const payload = {
@@ -271,6 +235,12 @@ export const LayoutProfessor = ({ children }) => {
       confirmationPassword: data.confirmationPassword,
       userID: user.id,
     };
+
+    console.log(payload, "payload");
+
+    console.log(methods.watch("lastPassword"), "lastPassword");
+    console.log(methods.watch("newPassword"), "newPassword");
+    console.log(methods.watch("confirmationPassword"), "confirmationPassword");
 
     await fetch(
       API_HOST +
@@ -286,6 +256,19 @@ export const LayoutProfessor = ({ children }) => {
     );
   }
 
+  const [v1, setV1] = useState("");
+  const [v2, setV2] = useState("");
+  const [v3, setV3] = useState("");
+
+  useEffect(() => {
+    console.log(v1);
+  }, [v1]);
+  useEffect(() => {
+    console.log(v2);
+  }, [v2]);
+  useEffect(() => {
+    console.log(v3);
+  }, [v3]);
   const [open, setOpen] = useState(false);
   return (
     <Box>
@@ -344,7 +327,8 @@ export const LayoutProfessor = ({ children }) => {
                     <div>
                       <Label>Senha antiga</Label>
                       <Input
-                        {...methods.register("lastPassword")}
+                        onChange={(e) => setV1(e.target.value)}
+                        value={v1}
                         className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                         type="password"
                       />
@@ -352,7 +336,8 @@ export const LayoutProfessor = ({ children }) => {
                     <div>
                       <Label>Nova senha</Label>
                       <Input
-                        {...methods.register("newPassword")}
+                        onChange={(e) => setV2(e.target.value)}
+                        value={v2}
                         className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                         type="password"
                       />
@@ -360,7 +345,8 @@ export const LayoutProfessor = ({ children }) => {
                     <div>
                       <Label>Repita a nova senha</Label>
                       <Input
-                        {...methods.register("confirmationPassword")}
+                        onChange={(e) => setV3(e.target.value)}
+                        value={v3}
                         className="mt-1 focus-visible:ring-ring focus-visible:ring-offset-0 focus-visible:ring-[#4E5B9F]"
                         type="password"
                       />
@@ -370,10 +356,13 @@ export const LayoutProfessor = ({ children }) => {
                         <Button variant="ghost">Cancel</Button>
                       </DialogClose>
                       <Button
-                        type="submit"
-                        onClick={() => {
-                          methods.handleSubmit(handleChangePassword);
-                          setOpen(false);
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleChangePassword({
+                            lastPassword: v1,
+                            newPassword: v2,
+                            confirmationPassword: v3,
+                          });
                         }}
                         className="bg-[#4e5b9f] hover:bg-[#4e5b9f]/50"
                       >
