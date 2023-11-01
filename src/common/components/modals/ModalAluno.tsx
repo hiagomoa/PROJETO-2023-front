@@ -13,7 +13,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Ref, forwardRef, useImperativeHandle } from "react";
+import { Ref, forwardRef, useContext, useImperativeHandle } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "react-toastify";
@@ -27,7 +27,7 @@ import {
   updateStudent,
 } from "@/common/services/database/student";
 import { queryClient } from "@/common/services/queryClient";
-import { useSession } from "next-auth/react";
+import { AuthContext } from "@/context/auth.context";
 import { FormMultiSelect } from "../inputs/FormMultiSelect";
 
 const schema = yup
@@ -48,9 +48,9 @@ const ModalBase = (
   const create = useMutation(createStudent);
   const updated = useMutation(updateStudent);
 
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const { data: classes } = useQuery(
-    ["classes", { id: session?.user?.id, role: session?.user?.role }],
+    ["classes", { id: user?.id, role: user?.role }],
     listClass
   );
   const {
@@ -76,7 +76,7 @@ const ModalBase = (
         },
       });
     } else {
-      newData.professorId = session?.user.id;
+      newData.professorId = user.id;
       await create.mutateAsync(newData, {
         onSuccess: () => {
           toast.success("Aluno cadastrado com sucesso!");
@@ -126,7 +126,7 @@ const ModalBase = (
                 name="classId"
                 defaultValue={
                   classId && isOnClassEdit
-                    ? classes.data.find((option) => option.id === classId)
+                    ? classes.find((option) => option.id === classId)
                     : undefined
                 }
                 control={control}
@@ -135,7 +135,7 @@ const ModalBase = (
                     {...field}
                     required
                     placeholder="Turma"
-                    options={classes.data}
+                    options={classes}
                     getOptionValue={(option: any) => option.id}
                     getOptionLabel={(option: any) => option.name}
                     error={errors.classId?.message}

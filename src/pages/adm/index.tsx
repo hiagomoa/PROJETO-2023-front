@@ -1,16 +1,16 @@
-import { Container } from "@/common/components/layout/Container";
-import { LayoutAdm } from "@/common/components/layout/Layout";
-import { ModalDelete } from "@/common/components/modals/ModalDelete";
-import { ModalProfessor } from "@/common/components/modals/ModalProfessor";
-import ListProfessor from "@/common/components/tables/ListProfessor";
-import { deleteProf, listProfs } from "@/common/services/database/professor";
-import { queryClient } from "@/common/services/queryClient";
-import { withPermission } from "@/common/utils/withPermission";
-import {
-  Box,
-} from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useMutation, useQuery } from "react-query";
+import { Container } from "../../common/components/layout/Container";
+import { LayoutAdm } from "../../common/components/layout/Layout";
+import { ModalDelete } from "../../common/components/modals/ModalDelete";
+import { ModalProfessor } from "../../common/components/modals/ModalProfessor";
+import ListProfessor from "../../common/components/tables/ListProfessor";
+import {
+  deleteProf,
+  listProfs,
+} from "../../common/services/database/professor";
+import { queryClient } from "../../common/services/queryClient";
 
 const Adm = () => {
   const deleteProfessor = useMutation(deleteProf);
@@ -37,7 +37,7 @@ const Adm = () => {
       <Box mt={10}>
         <Container>
           <ListProfessor
-            professors={profs?.data || []}
+            professors={profs}
             handleDeleteConfirmation={handleDeleteConfirmation}
             handleEditClick={handleEditClick}
           />
@@ -49,9 +49,3 @@ const Adm = () => {
   );
 };
 export default Adm;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "ADMIN");

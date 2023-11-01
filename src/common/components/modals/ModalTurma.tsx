@@ -1,11 +1,4 @@
-import { IClass } from "@/common/interfaces/class.interface";
-import {
-  createClass,
-  getClassById,
-  updateClass,
-} from "@/common/services/database/class";
-import { queryClient } from "@/common/services/queryClient";
-import { API_HOST } from "@/common/utils/config";
+import { AuthContext } from "@/context/auth.context";
 import {
   Box,
   Button,
@@ -23,12 +16,25 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useSession } from "next-auth/react";
-import { Ref, forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  Ref,
+  forwardRef,
+  useContext,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import * as yup from "yup";
+import { IClass } from "../../interfaces/class.interface";
+import {
+  createClass,
+  getClassById,
+  updateClass,
+} from "../../services/database/class";
+import { queryClient } from "../../services/queryClient";
+import { API_HOST } from "../../utils/config";
 import { FormInput } from "../inputs/FormInput";
 import ListStudents from "../tables/ListStudents";
 import { ModalAluno } from "./ModalAluno";
@@ -46,12 +52,6 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
   const create = useMutation(createClass);
   const updated = useMutation(updateClass);
 
-  const { data: session } = useSession();
-
-  useEffect(() => {
-    console.log(ref);
-  }, []);
-
   const {
     control,
     register,
@@ -63,6 +63,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
   } = useForm<IClass | any>({
     resolver: yupResolver(schema),
   });
+  const { user } = useContext(AuthContext);
 
   const id = watch("id");
   const onSubmit = async (data) => {
@@ -75,7 +76,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
         },
       });
     } else {
-      data.professorId = session?.user?.id;
+      data.professorId = user?.id;
       await create.mutateAsync(data, {
         onSuccess: () => {
           toast.success("Turma cadastrada com sucesso!");
@@ -124,6 +125,8 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
   const handleEditClick = (id: string) => {
     modalStudent.current.onOpen(id);
   };
+
+  watch("students");
 
   if (id) {
     return (

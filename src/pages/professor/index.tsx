@@ -5,11 +5,11 @@ import { ModalExercicio } from "@/common/components/modals/ModalExercicio";
 import ListExercises from "@/common/components/tables/ListExercise";
 import { listClass } from "@/common/services/database/class";
 import { listExercises } from "@/common/services/database/exercicio";
-import { withPermission } from "@/common/utils/withPermission";
+import { API_HOST } from "@/common/utils/config";
+import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useSession } from "next-auth/react";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import * as yup from "yup";
@@ -35,9 +35,9 @@ const Professor = () => {
   });
 
   const modalexercicio = useRef();
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const { data: classes } = useQuery(
-    ["classes", { id: session?.user?.id, role: session?.user?.role }],
+    ["classes", { id: user?.id, role: user?.role }],
     listClass
   );
 
@@ -45,13 +45,27 @@ const Professor = () => {
     [
       "exercise",
       {
-        classId: selectedClassId,
-        id: session?.user?.id,
-        role: session?.user?.role,
+        classId: selectedClassId !== null ? selectedClassId : null,
+        id: user?.id,
+        role: user?.role,
       },
     ],
     listExercises
   );
+
+  useEffect(() => {
+    console.log(exercise);
+  }, [exercise]);
+
+  const handleSelect = async (id: string) => {
+    await fetch(`${API_HOST}/exercise/${id}`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setSelectedClassId(data.classId);
+      });
+  };
 
   return (
     <LayoutProfessor>
@@ -77,13 +91,13 @@ const Professor = () => {
                     placeholder="Turma"
                     options={[
                       { id: null, name: "Todas as Turmas" }, // Opção para limpar o filtro
-                      ...(classes?.data || []),
+                      ...(classes || []),
                     ]}
                     getOptionValue={(option: any) => option.id}
                     getOptionLabel={(option: any) => option.name}
                     error={errors.classId?.message}
                     onChange={(selectedOption) =>
-                      setSelectedClassId(selectedOption.id)
+                      handleSelect(selectedOption.id)
                     }
                   />
                 )}
@@ -98,7 +112,7 @@ const Professor = () => {
             </Button>
           </Flex>
 
-          <ListExercises scope="prof" data={exercise?.data} />
+          <ListExercises scope="prof" data={exercise} />
         </Box>
       </Container>
       <ModalExercicio ref={modalexercicio} />
@@ -106,9 +120,3 @@ const Professor = () => {
   );
 };
 export default Professor;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "PROFESSOR");

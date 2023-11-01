@@ -1,30 +1,29 @@
-import { Container } from "@/common/components/layout/Container";
-import { LayoutProfessor } from "@/common/components/layout/Layout";
-import { ModalDelete } from "@/common/components/modals/ModalDelete";
-import { ModalTurma } from "@/common/components/modals/ModalTurma";
-import ListClass from "@/common/components/tables/ListClass";
-import { deleteClass, listClass } from "@/common/services/database/class";
-import { queryClient } from "@/common/services/queryClient";
-import { withPermission } from "@/common/utils/withPermission";
+import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useEffect, useRef } from "react";
+import { useContext, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
+import { Container } from "../../../common/components/layout/Container";
+import { LayoutProfessor } from "../../../common/components/layout/Layout";
+import { ModalDelete } from "../../../common/components/modals/ModalDelete";
+import { ModalTurma } from "../../../common/components/modals/ModalTurma";
+import ListClass from "../../../common/components/tables/ListClass";
+import {
+  deleteClass,
+  listClass,
+} from "../../../common/services/database/class";
+import { queryClient } from "../../../common/services/queryClient";
 
 const Turmas = () => {
   const modalturmas = useRef();
   const modaldelete = useRef();
   const deleteClasses = useMutation(deleteClass);
+  const { user } = useContext(AuthContext);
+  // const [classes,setCLasses] = useState()
 
-  const { data: session } = useSession();
   const { data: classes, isLoading } = useQuery(
-    ["classes", { id: session?.user?.id, role: session?.user?.role }],
+    ["classes", { id: user?.id, role: user?.role }],
     listClass
   );
-
-  useEffect(() => {
-    console.log(classes);
-  }, [classes]);
 
   const handleDeleteConfirmation = (id) => {
     modaldelete?.current.open(
@@ -58,7 +57,7 @@ const Turmas = () => {
           </Flex>
         </Box>
         <ListClass
-          classes={classes?.data}
+          classes={classes}
           handleDeleteConfirmation={handleDeleteConfirmation}
           handleEditClick={handleEditClick}
         />
@@ -69,9 +68,3 @@ const Turmas = () => {
   );
 };
 export default Turmas;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "PROFESSOR");

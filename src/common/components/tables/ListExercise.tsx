@@ -1,12 +1,12 @@
-import { API_HOST } from "@/common/utils/config";
-import { formatDateTime } from "@/common/utils/formatDateTime";
-import { Exercise, ProfessorContext } from "@/context/professor.context";
+import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
-import { useSession } from "next-auth/react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { Exercise, ProfessorContext } from "../../../context/professor.context";
+import { API_HOST } from "../../utils/config";
+import { formatDateTime } from "../../utils/formatDateTime";
 import { FormEditorHtml } from "../inputs/FormEditorHtml";
 import { ModalMain } from "../modals/ModalMain";
 import { CardExercicios } from "../professor/CardExercicios";
@@ -26,7 +26,7 @@ const ListExercises = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
-  const { data: session } = useSession();
+  const { user } = useContext(AuthContext);
   const [props, setProps] = useState<IProps>();
   const {
     handleSelectExercise,
@@ -48,7 +48,7 @@ const ListExercises = ({
       // @ts-ignore
       axios
         .post(`${API_HOST}/answer/out-put`, {
-          studentId: session?.user?.id,
+          studentId: user?.id,
           exerciseId: exercise.id,
         })
         .then((r) => {
@@ -86,12 +86,15 @@ const ListExercises = ({
         .then((item: any) => {
           if (item.data.length >= 1) {
             const r = item.data.map((i: any) => {
+              console.log(i);
               return {
                 name: i.student.name,
                 ra: i.student.ra,
                 isOk: `${i.totalAnswersOk}/${item.data.length}`,
                 endDate: exercise.dueDate,
                 list_inOut: i.list_inOut,
+                maxAttempts: exercise.maxAttempts,
+
                 exerciseCreated: exercise.created_at,
                 exerciseName: exercise.name,
                 url: i.answer,
@@ -117,7 +120,7 @@ const ListExercises = ({
       try {
         // @ts-ignore
         await axios.post(
-          `${API_HOST}/upload?entity=studentAnswer&studentId=${session?.user?.id}&exerciseId=${props?.exCurrent?.id}`,
+          `${API_HOST}/upload?entity=studentAnswer&studentId=${user?.id}&exerciseId=${props?.exCurrent?.id}`,
           formData,
           {
             headers: {
@@ -486,6 +489,9 @@ const ListExercises = ({
       </>
     );
   }
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
   return (
     <>
@@ -509,25 +515,26 @@ const ListExercises = ({
       >
         <Grid templateColumns={{ md: "repeat(3, 1fr)" }} gap={10}>
           {data?.length === 0 && <Text>Nenhum exercício encontrado</Text>}
-          {data?.map((exercise: Exercise, key: number) => (
-            <GridItem
-              key={key}
-              onClick={() => {
-                handleSelectExercise(exercise), updateModal(exercise);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <CardExercicios
-                name={exercise?.name}
-                description={exercise?.description}
-                date={formatDateTime(
-                  new Date(exercise?.dueDate.split(":00.")[0])
-                )}
-                maxAttempts={exercise?.maxAttempts}
-                myClass={exercise?.className}
-              />
-            </GridItem>
-          ))}
+          {data &&
+            data?.map((exercise: Exercise, key: number) => (
+              <GridItem
+                key={key}
+                onClick={() => {
+                  handleSelectExercise(exercise), updateModal(exercise);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <CardExercicios
+                  name={exercise?.name}
+                  description={exercise?.description}
+                  date={formatDateTime(
+                    new Date(exercise?.dueDate.split(":00.")[0])
+                  )}
+                  maxAttempts={exercise?.maxAttempts}
+                  myClass={exercise?.class.name}
+                />
+              </GridItem>
+            ))}
         </Grid>
       </Box>
     </>

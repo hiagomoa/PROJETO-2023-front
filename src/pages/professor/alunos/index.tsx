@@ -1,30 +1,32 @@
-import { Container } from "@/common/components/layout/Container";
-import { LayoutProfessor } from "@/common/components/layout/Layout";
-import { ModalAluno } from "@/common/components/modals/ModalAluno";
-import { ModalDelete } from "@/common/components/modals/ModalDelete";
-import ListStudents from "@/common/components/tables/ListStudents";
+import { AuthContext } from "@/context/auth.context";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { useContext, useEffect, useRef } from "react";
+import { useMutation, useQuery } from "react-query";
+import { Container } from "../../../common/components/layout/Container";
+import { LayoutProfessor } from "../../../common/components/layout/Layout";
+import { ModalAluno } from "../../../common/components/modals/ModalAluno";
+import { ModalDelete } from "../../../common/components/modals/ModalDelete";
+import ListStudents from "../../../common/components/tables/ListStudents";
 import {
   deleteStudent,
   listStudents,
-} from "@/common/services/database/student";
-import { queryClient } from "@/common/services/queryClient";
-import { withPermission } from "@/common/utils/withPermission";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useRef } from "react";
-import { useMutation, useQuery } from "react-query";
+} from "../../../common/services/database/student";
+import { queryClient } from "../../../common/services/queryClient";
 
 const ProfessorAlunos = () => {
   const modalAlunos = useRef();
   const modaldelete = useRef();
   const deleteStudents = useMutation(deleteStudent);
 
-  const { data: session } = useSession();
-
+  const { user } = useContext(AuthContext);
   const { data: students, isLoading } = useQuery(
-    ["students", { id: session?.user?.id, role: session?.user?.role }],
+    ["students", { id: user?.id, role: user?.role }],
     listStudents
   );
+
+  useEffect(() => {
+    console.log(students);
+  }, [students]);
 
   const handleDeleteConfirmation = (studentId) => {
     modaldelete?.current.open(
@@ -58,7 +60,7 @@ const ProfessorAlunos = () => {
           </Flex>
         </Box>
         <ListStudents
-          students={students?.data || []}
+          students={students || []}
           handleDeleteConfirmation={handleDeleteConfirmation}
           handleEditClick={handleEditClick}
         />
@@ -70,9 +72,3 @@ const ProfessorAlunos = () => {
 };
 
 export default ProfessorAlunos;
-
-export const getServerSideProps = withPermission(async (ctx) => {
-  return {
-    props: {},
-  };
-}, "PROFESSOR");
