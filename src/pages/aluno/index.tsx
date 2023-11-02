@@ -39,8 +39,6 @@ const Alunos = () => {
     listClass
   );
 
-  console.log(classes, "classes");
-
   const handleSelect = async (id: string) => {
     await fetch(`${API_HOST}/exercise/${id}`, {
       method: "GET",
@@ -68,7 +66,6 @@ const Alunos = () => {
   const [duePast, setDuePast] = useState<Exercise[]>();
 
   useEffect(() => {
-    console.log(exercise, "exercise");
     const dueToday =
       exercise &&
       exercise?.filter((item: any, i: number) => {
@@ -86,7 +83,6 @@ const Alunos = () => {
     const dueLater =
       exercise &&
       exercise?.filter((item: any, i: number) => {
-        console.log(item);
 
         const dueDate = new Date(item?.dueDate.split(":00.")[0]);
 

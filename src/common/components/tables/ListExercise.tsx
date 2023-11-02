@@ -25,7 +25,7 @@ const ListExercises = ({
   exercises?: any;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   const { user } = useContext(AuthContext);
   const [props, setProps] = useState<IProps>();
   const {
@@ -86,7 +86,6 @@ const ListExercises = ({
         .then((item: any) => {
           if (item.data.length >= 1) {
             const r = item.data.map((i: any) => {
-              console.log(i);
               return {
                 name: i.student.name,
                 ra: i.student.ra,
@@ -120,7 +119,7 @@ const ListExercises = ({
       try {
         // @ts-ignore
         await axios.post(
-          `${API_HOST}/upload?entity=studentAnswer&studentId=${user?.id}&exerciseId=${props?.exCurrent?.id}`,
+          `${API_HOST}/upload?entity=studentAnswer&studentId=${user?.id}&exerciseId=${props?.exCurrent?.id}&name=${file.name}`,
           formData,
           {
             headers: {
@@ -489,9 +488,7 @@ const ListExercises = ({
       </>
     );
   }
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  useEffect(() => {}, [data]);
 
   return (
     <>

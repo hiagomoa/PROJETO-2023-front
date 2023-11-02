@@ -15,9 +15,7 @@ export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps) {
-  useEffect(() => {
-    console.log(process.env.HOST_URL);
-  }, []);
+
   return (
     <AuthProvider>
       <ToastContainer

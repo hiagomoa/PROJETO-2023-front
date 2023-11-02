@@ -55,7 +55,6 @@ const Index = () => {
   const [result, setResult] = useState("");
 
   const onSubmit = async (data: { email: string; password: string }) => {
-    console.log(data);
     await signIn(data.email, data.password);
   };
 

@@ -24,10 +24,6 @@ const ProfessorAlunos = () => {
     listStudents
   );
 
-  useEffect(() => {
-    console.log(students);
-  }, [students]);
-
   const handleDeleteConfirmation = (studentId) => {
     modaldelete?.current.open(
       "Tem certeza de que deseja excluir este aluno?",

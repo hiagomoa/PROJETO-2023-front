@@ -16,16 +16,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { PlusCircle, Trash } from "@phosphor-icons/react";
 import axios from "axios";
 import dynamic from "next/dynamic";
-import {
-  forwardRef,
-  useContext,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
+import { forwardRef, useContext, useImperativeHandle, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 import * as yup from "yup";
 import { listClass } from "../../services/database/class";
 import {
@@ -89,10 +84,6 @@ const ModalBase = ({}, ref) => {
     },
   }));
 
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
-
   const [fileBlocks, setFileBlocks] = useState([{}]);
   const [uploadStatus, setUploadStatus] = useState([]);
 
@@ -117,15 +108,24 @@ const ModalBase = ({}, ref) => {
 
     try {
       const formData = new FormData();
+      const inName = `${uuidv4()}-${block.inFile.name}`;
       formData.append("file", block.inFile);
-      formData.append("file", block.outFile);
-
-      const response = await axios.post(
-        `${API_HOST}/upload?entity=exerciseTeacher&entityId=${id}`,
+      formData.append("name", inName);
+      await axios.post(
+        `${API_HOST}/upload?entity=exerciseTeacher&entityId=${id}&name=${inName}`,
         formData
       );
 
-      console.log("Upload bem-sucedido:", response.data);
+      const formData2 = new FormData();
+      const outName = `${uuidv4()}-${block.outFile.name}`;
+      formData2.append("file", block.outFile);
+      formData2.append("name", outName);
+      formData2.append("correspondingInFile", inName);
+
+      await axios.post(
+        `${API_HOST}/upload?entity=exerciseTeacher&entityId=${id}&name=${outName}`,
+        formData2
+      );
 
       const updatedStatus: any = [...uploadStatus];
       updatedStatus[index] = "Upload bem-sucedido";
@@ -163,8 +163,6 @@ const ModalBase = ({}, ref) => {
       data.classId = data?.classId?.id;
       data.professorId = user?.id;
 
-      console.log(data);
-
       const result = await create
         .mutateAsync(data, {
           onSuccess: () => {
@@ -176,7 +174,6 @@ const ModalBase = ({}, ref) => {
         .then(async (item) => {
           await Promise.all(
             fileBlocks.map(async (f, i) => {
-              console.log(i, item, "asodihnasiudbuaysbdyuasbdyu", f);
               await uploadFile(i, item.id);
             })
           );
