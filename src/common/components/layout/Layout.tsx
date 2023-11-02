@@ -47,15 +47,7 @@ export const LayoutAlunos = ({ children }) => {
   const [v2, setV2] = useState("");
   const [v3, setV3] = useState("");
 
-  useEffect(() => {
-    console.log(v1);
-  }, [v1]);
-  useEffect(() => {
-    console.log(v2);
-  }, [v2]);
-  useEffect(() => {
-    console.log(v3);
-  }, [v3]);
+
   const [open, setOpen] = useState(false);
   return (
     <Box>
@@ -159,7 +151,6 @@ export const LayoutAlunos = ({ children }) => {
 
 export const LayoutAdm = ({ children }) => {
   const { signOut, user } = useContext(AuthContext);
-  console.log(user);
   const modalprofessor = useRef();
 
   const methods = useForm();
@@ -236,11 +227,6 @@ export const LayoutProfessor = ({ children }) => {
       userID: user.id,
     };
 
-    console.log(payload, "payload");
-
-    console.log(methods.watch("lastPassword"), "lastPassword");
-    console.log(methods.watch("newPassword"), "newPassword");
-    console.log(methods.watch("confirmationPassword"), "confirmationPassword");
 
     await fetch(
       API_HOST +
@@ -260,15 +246,7 @@ export const LayoutProfessor = ({ children }) => {
   const [v2, setV2] = useState("");
   const [v3, setV3] = useState("");
 
-  useEffect(() => {
-    console.log(v1);
-  }, [v1]);
-  useEffect(() => {
-    console.log(v2);
-  }, [v2]);
-  useEffect(() => {
-    console.log(v3);
-  }, [v3]);
+
   const [open, setOpen] = useState(false);
   return (
     <Box>

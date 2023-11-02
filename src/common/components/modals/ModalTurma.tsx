@@ -67,7 +67,6 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
 
   const id = watch("id");
   const onSubmit = async (data) => {
-    console.log(data);
     if (data.id) {
       await updated.mutateAsync(data, {
         onSuccess: () => {

@@ -2,6 +2,7 @@ import { API_HOST } from "@/common/utils/config";
 import cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { ReactNode, createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 type TypeAuthContext = {
   user: any;
@@ -23,10 +24,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         cookies.set("token", data.token, { expires: 60 * 60 });
         cookies.set("role", data.user.role, { expires: 60 * 60 });
-        console.log(data);
         setUser(data.user);
 
         if (data.user.role === "PROFESSOR") {
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           router.push("/adm");
         }
       })
-      .catch((err) => console.log(err, "err"));
+      .catch((err) => toast.error("Email ou senha incorretos"));
   }
   const router = useRouter();
 

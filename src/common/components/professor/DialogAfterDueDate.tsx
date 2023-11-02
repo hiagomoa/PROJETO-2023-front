@@ -12,11 +12,7 @@ const getAnswers = async (exerciseID: string | undefined) => {
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       return data;
-    })
-    .catch((error) => {
-      console.log(error);
     });
 };
 
@@ -32,9 +28,6 @@ export function DialogAfterDueDate({ id }: { id: string | undefined }) {
     t();
   }, [id]);
 
-  useEffect(() => {
-    console.log({ answers });
-  }, [answers]);
 
   return <>teste due date</>;
 }

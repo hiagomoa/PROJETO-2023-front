@@ -53,10 +53,6 @@ const Professor = () => {
     listExercises
   );
 
-  useEffect(() => {
-    console.log(exercise);
-  }, [exercise]);
-
   const handleSelect = async (id: string) => {
     await fetch(`${API_HOST}/exercise/${id}`, {
       method: "GET",

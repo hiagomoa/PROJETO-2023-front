@@ -16,7 +16,6 @@ const ListProfessor = ({
   handleEditClick,
   handleDeleteConfirmation,
 }) => {
-  console.log(professors, "professors");
   return (
     <TableContainer>
       <Table variant="striped" colorScheme="gray">
