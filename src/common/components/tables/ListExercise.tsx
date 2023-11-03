@@ -527,9 +527,7 @@ const ListExercises = ({
                 <CardExercicios
                   name={exercise?.name}
                   description={exercise?.description}
-                  date={formatDateTime(
-                    new Date(exercise?.dueDate.split(":00.")[0])
-                  )}
+                  date={formatDateTime(new Date(exercise?.dueDate))}
                   maxAttempts={exercise?.maxAttempts}
                   myClass={exercise?.class.name}
                 />
