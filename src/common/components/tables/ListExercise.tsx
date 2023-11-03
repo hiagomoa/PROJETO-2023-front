@@ -2,6 +2,7 @@ import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { Exercise, ProfessorContext } from "../../../context/professor.context";
@@ -30,6 +31,24 @@ const ListExercises = ({
   const [file, setFile] = useState<File | null>(null);
   const { user } = useContext(AuthContext);
   const [props, setProps] = useState<IProps>();
+  const [inOuts, setInOuts] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log(inOuts);
+  }, [inOuts]);
+
+  async function getInOuts(id: string) {
+    await fetch(`${API_HOST}/inOuts/${id}`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // setInOuts(data?.data?.inOuts);
+      });
+  }
+  const router = useRouter();
+
   const {
     handleSelectExercise,
     selectedExercise,
@@ -44,7 +63,7 @@ const ListExercises = ({
     updateExercise,
   } = useContext(ProfessorContext);
 
-  function updateModal(exercise?: any) {
+  async function updateModal(exercise?: any) {
     setIsOpen(!isOpen);
     if (exercise && scope == "student") {
       // @ts-ignore
@@ -82,19 +101,27 @@ const ListExercises = ({
           });
         });
     } else if (exercise) {
-      axios
+      await axios.get(`${API_HOST}/inOuts/${exercise.id}`).then((item) => {
+        setInOuts(item.data);
+        console.log(inOuts[0], "inOuts");
+      });
+      await axios
         .get(`${API_HOST}/exercise/get-users-by-exc/${exercise.id}`)
         .then((item: any) => {
-          if (item.data.length >= 1) {
-            const r = item.data.map((i: any) => {
+          if (item.data.data.length >= 1) {
+            const r = item.data.data.map((i: any) => {
               return {
+                student: i.student,
                 name: i.student.name,
                 ra: i.student.ra,
-                isOk: `${i.totalAnswersOk}/${item.data.length}`,
+                report: exercise.report,
+                exerciseId: exercise.id,
                 endDate: exercise.dueDate,
+                inOuts: inOuts,
+                math: inOuts.filter((ii) => ii.exerciseId === exercise.id)
+                  .length,
                 list_inOut: i.list_inOut,
                 maxAttempts: exercise.maxAttempts,
-
                 exerciseCreated: exercise.created_at,
                 exerciseName: exercise.name,
                 url: i.answer,
@@ -142,6 +169,20 @@ const ListExercises = ({
   const [value, setValue] = useState("");
 
   function MyModal() {
+    const handleSimilarity = async (id: string) => {
+      await console.log(id, "id");
+      await fetch(`${process.env.API_SIMILARITY}/moss`, {
+        body: JSON.stringify({ idExercise: id }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+        .then((r) => toast.success("Similaridade gerada com sucesso!"))
+        .catch((e) => toast.error("Erro ao gerar similaridade!"));
+    };
+
     if (
       scope == "prof" &&
       props?.exCurrent &&
@@ -164,6 +205,28 @@ const ListExercises = ({
             }}
           >
             <span> Data de finalização {formatDateTime(date)} </span>
+            <div className="flex gap-3">
+              <Button
+                onClick={(e) => handleSimilarity(props.exCurrent[0].exerciseId)}
+                bg="#3182CE"
+                color="white"
+                maxWidth="180px"
+              >
+                Gerar similaridade
+              </Button>
+              {props.exCurrent[0].report && (
+                <Button
+                  onClick={() => {
+                    router.push(props.exCurrent[0].report);
+                  }}
+                  bg="#3182CE"
+                  color="white"
+                  maxWidth="180px"
+                >
+                  Ver report
+                </Button>
+              )}
+            </div>
           </div>
 
           <Box>
@@ -268,7 +331,7 @@ const ListExercises = ({
           }}
         >
           <Text fontWeight="bold" color="#313B6D">
-            EXERCICIO FINALIZADO E SEM PENDENCIAS DE CORRECAO!
+            EXERCICIO FINALIZADO E SEM RESPOSTAS!
           </Text>
         </Box>
       );
