@@ -19,10 +19,12 @@ const ListExercises = ({
   exercises,
   scope = "student",
   data,
+  status,
 }: {
   data: Exercise[];
   scope?: string;
   exercises?: any;
+  status?: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -52,18 +54,17 @@ const ListExercises = ({
           exerciseId: exercise.id,
         })
         .then((r) => {
-          const { data } = r;
           setProps({
             ...props,
             exCurrent: {
               html: exercise.html,
               title: exercise.name,
               expectedDate: new Date(exercise.dueDate),
-              tryIt: Number(data.testNumber || 0),
               maxAttempts: exercise.maxAttempts,
               id: exercise.id,
+              attempts: r.data.attempts || 0,
             },
-            outPutEx: data,
+            outPutEx: r.data.inOut,
           });
         })
         .catch((error) => {
@@ -73,7 +74,7 @@ const ListExercises = ({
               html: exercise.html,
               title: exercise.name,
               expectedDate: new Date(exercise.dueDate),
-              tryIt: 0,
+              attempts: 0,
               maxAttempts: exercise.maxAttempts,
               id: exercise.id,
             },
@@ -312,7 +313,7 @@ const ListExercises = ({
               </span>
               <span>
                 Tentativas Restantes{" "}
-                {props.exCurrent.maxAttempts - props.exCurrent.tryIt}
+                {props.exCurrent.maxAttempts - props.exCurrent.attempts}
               </span>
             </div>
             <div
@@ -338,33 +339,35 @@ const ListExercises = ({
                 dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
               ></div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  padding: "10px 0",
-                  margin: "10px 0 ",
-                  width: "100%",
-                  background: "#fff",
-                }}
-              >
-                <input
-                  type="file"
-                  accept=".py, .out, .in"
-                  onChange={handleFileChange}
-                />
-                <Button
-                  bg="#3182CE"
-                  mt={3}
-                  color="white"
-                  onClick={handleUpload}
-                  maxWidth="180px"
+              {status && status === "dueLater" && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: "10px 0",
+                    margin: "10px 0 ",
+                    width: "100%",
+                    background: "#fff",
+                  }}
                 >
-                  Enviar Arquivo
-                </Button>
-              </div>
+                  <input
+                    type="file"
+                    accept=".py, .out, .in"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    bg="#3182CE"
+                    mt={3}
+                    color="white"
+                    onClick={handleUpload}
+                    maxWidth="180px"
+                  >
+                    Enviar Arquivo
+                  </Button>
+                </div>
+              )}
             </div>
 
             {props?.outPutEx?.length >= 1 && (
@@ -390,7 +393,7 @@ const ListExercises = ({
                         }}
                       >
                         {" "}
-                        {`Test ${Number(item.testNumber)}`}
+                        {item.testNumber}
                         <div
                           style={{
                             display: "flex",

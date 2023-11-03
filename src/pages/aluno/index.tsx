@@ -70,24 +70,37 @@ const Alunos = () => {
       exercise &&
       exercise?.filter((item: any, i: number) => {
         let dueDate = new Date(item?.dueDate.split(":00.")[0]);
-
         if (
-          dueDate.getDay() < new Date().getDay() &&
           dueDate.getMonth() <= new Date().getMonth() &&
           dueDate.getFullYear() <= new Date().getFullYear()
         ) {
-          return item;
+          if (
+            new Date().getMonth() === dueDate.getMonth() &&
+            new Date().getFullYear() === dueDate.getFullYear()
+          ) {
+            if (dueDate.getDate() < new Date().getDate()) {
+              if (item.StudentAnswer && item.StudentAnswer.length === 0) {
+                return item;
+              }
+            }
+          }
+
+          if (
+            dueDate.getMonth() < new Date().getMonth() &&
+            new Date().getFullYear() === dueDate.getFullYear()
+          ) {
+            return item;
+          }
         }
       });
 
     const dueLater =
       exercise &&
       exercise?.filter((item: any, i: number) => {
-
         const dueDate = new Date(item?.dueDate.split(":00.")[0]);
 
         if (
-          dueDate.getDay() >= new Date().getDay() &&
+          dueDate.getDate() >= new Date().getDate() &&
           dueDate.getMonth() >= new Date().getMonth() &&
           dueDate.getFullYear() >= new Date().getFullYear()
         ) {
@@ -95,21 +108,25 @@ const Alunos = () => {
         }
       });
 
-    // const duePast = exercise?.data.filter((item: any, i: number) => {
-    //   let dueDate = new Date(item?.dueDate.split(":00.")[0]);
-
-    //   if (
-    //     dueDate.getDay() < new Date().getDay() &&
-    //     dueDate.getMonth() <= new Date().getMonth() &&
-    //     dueDate.getFullYear() <= new Date().getFullYear()
-    //   ) {
-    //     return item;
-    //   }
-    // });
+    const duePast =
+      exercise &&
+      exercise?.filter((item: any, i: number) => {
+        let dueDate = new Date(item?.dueDate.split(":00.")[0]);
+        if (
+          dueDate.getMonth() <= new Date().getMonth() &&
+          dueDate.getFullYear() <= new Date().getFullYear()
+        ) {
+          if (dueDate.getDate() <= new Date().getDate()) {
+            if (item.StudentAnswer && item.StudentAnswer.length > 0) {
+              return item;
+            }
+          }
+        }
+      });
 
     setDueLater(dueLater);
     setDueToday(dueToday);
-    // setDuePast(duePast);
+    setDuePast(duePast);
   }, [exercise]);
 
   return (
@@ -152,7 +169,7 @@ const Alunos = () => {
               </Box>
             </Flex>
           </Box>
-          {dueLater && <ListExercises data={dueLater} />}
+          {dueLater && <ListExercises status="dueLater" data={dueLater} />}
           <Text
             color="#313B6D"
             mt="4rem"
@@ -162,7 +179,7 @@ const Alunos = () => {
           >
             EXERCÍCIOS ATRASADOS
           </Text>
-          {dueToday && <ListExercises data={dueToday} />}
+          {dueToday && <ListExercises status="dueToday" data={dueToday} />}
           <Text
             color="#313B6D"
             mt="4rem"
@@ -172,7 +189,7 @@ const Alunos = () => {
           >
             EXERCÍCIOS CONCLUIDOS
           </Text>
-          {duePast && <ListExercises data={duePast} />}
+          {duePast && <ListExercises status="duePast" data={duePast} />}
         </Container>
       </LayoutAlunos>
     </>
