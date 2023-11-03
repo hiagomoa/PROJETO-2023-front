@@ -341,35 +341,37 @@ const ListExercises = ({
                 dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
               ></div>
 
-              {status && status === "dueLater" && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "10px 0",
-                    margin: "10px 0 ",
-                    width: "100%",
-                    background: "#fff",
-                  }}
-                >
-                  <input
-                    type="file"
-                    accept=".py, .out, .in"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    bg="#3182CE"
-                    mt={3}
-                    color="white"
-                    onClick={handleUpload}
-                    maxWidth="180px"
+              {status &&
+                status === "dueLater" &&
+                props.exCurrent.maxAttempts && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "10px 0",
+                      margin: "10px 0 ",
+                      width: "100%",
+                      background: "#fff",
+                    }}
                   >
-                    Enviar Arquivo
-                  </Button>
-                </div>
-              )}
+                    <input
+                      type="file"
+                      accept=".py, .out, .in"
+                      onChange={handleFileChange}
+                    />
+                    <Button
+                      bg="#3182CE"
+                      mt={3}
+                      color="white"
+                      onClick={handleUpload}
+                      maxWidth="180px"
+                    >
+                      Enviar Arquivo
+                    </Button>
+                  </div>
+                )}
             </div>
 
             {props?.outPutEx?.length >= 1 && (
