@@ -313,7 +313,9 @@ const ListExercises = ({
               </span>
               <span>
                 Tentativas Restantes{" "}
-                {props.exCurrent.maxAttempts - props.exCurrent.attempts}
+                {props.exCurrent.maxAttempts - props.exCurrent.attempts >= 0
+                  ? props.exCurrent.maxAttempts - props.exCurrent.attempts
+                  : "0"}
               </span>
             </div>
             <div
