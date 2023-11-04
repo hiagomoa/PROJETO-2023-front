@@ -265,7 +265,7 @@ const ListExercises = ({
 
               <Box sx={{ display: "flex", gap: "1.5rem" }}>
                 <Button bg="#3182CE" color="white" maxWidth="180px">
-                  Executar verificacao
+                  Verificar plágio
                 </Button>
                 <Button
                   bg="#3182CE"
@@ -383,7 +383,7 @@ const ListExercises = ({
             </div>
             <div
               style={{
-                padding: "10px",
+                padding: "10px 0 10px 0",
                 marginBottom: "10px",
                 width: "100%",
                 height: "auto",
@@ -394,15 +394,17 @@ const ListExercises = ({
                 alignItems: "center",
               }}
             >
-              <div
-                style={{
-                  textAlign: "left",
-                  width: "100%",
-                  background: "#fff",
-                  padding: "15px",
-                }}
-                dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
-              ></div>
+              <div className="flex flex-col items-center justify-center gap-2 p-2 border rounded-md w-full ">
+                <div
+                  style={{
+                    textAlign: "left",
+                    width: "100%",
+                    background: "#fff",
+                    padding: "15px",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
+                />
+              </div>
 
               {status &&
                 status === "dueLater" &&
@@ -419,7 +421,21 @@ const ListExercises = ({
                       background: "#fff",
                     }}
                   >
+                    <div className="flex flex-col items-center justify-center gap-2 p-2 border rounded-md">
+                      <button
+                        className="text-white bg-[#3182CE] px-2 max-w-[180px] py-2 rounded-md font-bold"
+                        onClick={() => {
+                          document.querySelector("#archive")?.click();
+                        }}
+                      >
+                        Selecionar arquivo
+                      </button>
+                      {file ? file.name : "Nenhum arquivo selecionado"}
+                    </div>
                     <input
+                      id="archive"
+                      className="hidden"
+                      placeholder="Selecione um arquivo"
                       type="file"
                       accept=".py, .out, .in"
                       onChange={handleFileChange}
@@ -431,7 +447,7 @@ const ListExercises = ({
                       onClick={handleUpload}
                       maxWidth="180px"
                     >
-                      Enviar Arquivo
+                      Enviar arquivo
                     </Button>
                   </div>
                 )}
@@ -509,7 +525,7 @@ const ListExercises = ({
 
                 <Box sx={{ display: "flex", gap: "1.5rem" }}>
                   <Button bg="#3182CE" color="white" maxWidth="180px">
-                    Executar verificacao
+                    Verificar plágio
                   </Button>
                   <Button
                     bg="#3182CE"

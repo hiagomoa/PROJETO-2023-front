@@ -70,7 +70,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
     if (data.id) {
       await updated.mutateAsync(data, {
         onSuccess: () => {
-          toast.success("Turma atualizada com sucesso!");
+          toast.success("Curso atualizado com sucesso!");
           queryClient.invalidateQueries(["classes"]);
         },
       });
@@ -78,7 +78,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
       data.professorId = user?.id;
       await create.mutateAsync(data, {
         onSuccess: () => {
-          toast.success("Turma cadastrada com sucesso!");
+          toast.success("Curso cadastrado com sucesso!");
           queryClient.invalidateQueries(["classes"]);
           onClose();
         },
@@ -154,7 +154,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
 
               {watch("name") === "" && (
                 <Text fontWeight="bold" color="#313B6D">
-                  Criar Turma
+                  Criar Curso
                 </Text>
               )}
 
@@ -209,7 +209,7 @@ const ModalBase = ({}, ref: Ref<UseDisclosureProps>) => {
       <ModalContent minW="60%">
         <form onSubmit={handleSubmit(onSubmit)}>
           <ModalHeader color="#313B6D">
-            {watch("id") ? "Atualizar Turma" : "Criar Turma"}
+            {watch("id") ? "Atualizar Curso" : "Criar Curso"}
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>

@@ -9,7 +9,7 @@ import { API_HOST } from "@/common/utils/config";
 import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import * as yup from "yup";
@@ -84,9 +84,9 @@ const Professor = () => {
                   <FormMultiSelect
                     {...field}
                     required
-                    placeholder="Turma"
+                    placeholder="Curso"
                     options={[
-                      { id: null, name: "Todas as Turmas" }, // Opção para limpar o filtro
+                      { id: null, name: "Todos os Curso" }, // Opção para limpar o filtro
                       ...(classes || []),
                     ]}
                     getOptionValue={(option: any) => option.id}

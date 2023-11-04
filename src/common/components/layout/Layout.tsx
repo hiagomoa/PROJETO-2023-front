@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { AuthContext } from "@/context/auth.context";
 import { Avatar, Box, Flex, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { ModalProfessor } from "../modals/ModalProfessor";
@@ -47,7 +47,6 @@ export const LayoutAlunos = ({ children }) => {
   const [v2, setV2] = useState("");
   const [v3, setV3] = useState("");
 
-
   const [open, setOpen] = useState(false);
   return (
     <Box>
@@ -59,7 +58,6 @@ export const LayoutAlunos = ({ children }) => {
                 <Flex gap={3} alignItems="center">
                   <Avatar name={String(user?.name)} />
                   <Box>
-                    <Text fontSize="sm">Engenharia de Computação</Text>
                     <Text fontSize="sm">{user?.name} </Text>
                     <Text fontSize="sm">RA: 1865658</Text>
                   </Box>
@@ -227,7 +225,6 @@ export const LayoutProfessor = ({ children }) => {
       userID: user.id,
     };
 
-
     await fetch(
       API_HOST +
         `/auth/change-password/?last=${payload.lastPassword}&new=${payload.newPassword}&confirmation=${payload.confirmationPassword}&user=${user.id}`,
@@ -245,7 +242,6 @@ export const LayoutProfessor = ({ children }) => {
   const [v1, setV1] = useState("");
   const [v2, setV2] = useState("");
   const [v3, setV3] = useState("");
-
 
   const [open, setOpen] = useState(false);
   return (
@@ -271,9 +267,9 @@ export const LayoutProfessor = ({ children }) => {
               <Text
                 as="button"
                 fontSize="sm"
-                onClick={() => router.push("/professor/turmas")}
+                onClick={() => router.push("/professor/cursos")}
               >
-                TURMAS
+                CURSOS
               </Text>
               <Text
                 as="button"

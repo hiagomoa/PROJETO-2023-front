@@ -45,14 +45,14 @@ const Turmas = () => {
         <Box my={5}>
           <Flex justify="space-between" my={10}>
             <Text color="#313B6D" fontWeight="bold" fontSize="3xl">
-              TURMAS CRIADAS
+              CURSOS CRIADOS
             </Text>
             <Button
               bg="blueglobal"
               color="white"
               onClick={() => modalturmas.current.onOpen()}
             >
-              Cadastrar Turma
+              Cadastrar Curso
             </Button>
           </Flex>
         </Box>
