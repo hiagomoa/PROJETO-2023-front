@@ -63,9 +63,13 @@ const ModalBase = ({}, ref) => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      description: " a",
+    },
   });
 
   useImperativeHandle(ref, () => ({
@@ -191,17 +195,10 @@ const ModalBase = ({}, ref) => {
             <Box display="grid" gap={5}>
               <Flex gap={5}>
                 <FormInput
-                  placeholder="Nome"
-                  label="Nome"
+                  placeholder="Título"
+                  label="Título"
                   {...register("name")}
                   error={errors.name?.message}
-                />
-
-                <FormInput
-                  placeholder="Descrição"
-                  label="Descrição"
-                  {...register("description")}
-                  error={errors.description?.message}
                 />
               </Flex>
               <Flex gap={5}>
@@ -212,8 +209,8 @@ const ModalBase = ({}, ref) => {
                     <FormMultiSelect
                       {...field}
                       required
-                      placeholder="Turma"
-                      label="Turma"
+                      placeholder="Curso"
+                      label="Curso"
                       options={classes}
                       getOptionValue={(option: any) => option.id}
                       getOptionLabel={(option: any) => option.name}

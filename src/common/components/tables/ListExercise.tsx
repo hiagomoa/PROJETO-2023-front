@@ -2,6 +2,7 @@ import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Grid, GridItem, Input, Text } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { Exercise, ProfessorContext } from "../../../context/professor.context";
@@ -30,6 +31,24 @@ const ListExercises = ({
   const [file, setFile] = useState<File | null>(null);
   const { user } = useContext(AuthContext);
   const [props, setProps] = useState<IProps>();
+  const [inOuts, setInOuts] = useState<any[]>([]);
+
+  useEffect(() => {
+    console.log(inOuts);
+  }, [inOuts]);
+
+  async function getInOuts(id: string) {
+    await fetch(`${API_HOST}/inOuts/${id}`, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // setInOuts(data?.data?.inOuts);
+      });
+  }
+  const router = useRouter();
+
   const {
     handleSelectExercise,
     selectedExercise,
@@ -44,7 +63,7 @@ const ListExercises = ({
     updateExercise,
   } = useContext(ProfessorContext);
 
-  function updateModal(exercise?: any) {
+  async function updateModal(exercise?: any) {
     setIsOpen(!isOpen);
     if (exercise && scope == "student") {
       // @ts-ignore
@@ -82,19 +101,27 @@ const ListExercises = ({
           });
         });
     } else if (exercise) {
-      axios
+      await axios.get(`${API_HOST}/inOuts/${exercise.id}`).then((item) => {
+        setInOuts(item.data);
+        console.log(inOuts[0], "inOuts");
+      });
+      await axios
         .get(`${API_HOST}/exercise/get-users-by-exc/${exercise.id}`)
         .then((item: any) => {
-          if (item.data.length >= 1) {
-            const r = item.data.map((i: any) => {
+          if (item.data.data.length >= 1) {
+            const r = item.data.data.map((i: any) => {
               return {
+                student: i.student,
                 name: i.student.name,
                 ra: i.student.ra,
-                isOk: `${i.totalAnswersOk}/${item.data.length}`,
+                report: exercise.report,
+                exerciseId: exercise.id,
                 endDate: exercise.dueDate,
+                inOuts: inOuts,
+                math: inOuts.filter((ii) => ii.exerciseId === exercise.id)
+                  .length,
                 list_inOut: i.list_inOut,
                 maxAttempts: exercise.maxAttempts,
-
                 exerciseCreated: exercise.created_at,
                 exerciseName: exercise.name,
                 url: i.answer,
@@ -142,6 +169,20 @@ const ListExercises = ({
   const [value, setValue] = useState("");
 
   function MyModal() {
+    const handleSimilarity = async (id: string) => {
+      await console.log(id, "id");
+      await fetch(`${process.env.API_SIMILARITY}/moss`, {
+        body: JSON.stringify({ idExercise: id }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+        .then((r) => toast.success("Similaridade gerada com sucesso!"))
+        .catch((e) => toast.error("Erro ao gerar similaridade!"));
+    };
+
     if (
       scope == "prof" &&
       props?.exCurrent &&
@@ -164,6 +205,28 @@ const ListExercises = ({
             }}
           >
             <span> Data de finalização {formatDateTime(date)} </span>
+            <div className="flex gap-3">
+              <Button
+                onClick={(e) => handleSimilarity(props.exCurrent[0].exerciseId)}
+                bg="#3182CE"
+                color="white"
+                maxWidth="180px"
+              >
+                Gerar similaridade
+              </Button>
+              {props.exCurrent[0].report && (
+                <Button
+                  onClick={() => {
+                    router.push(props.exCurrent[0].report);
+                  }}
+                  bg="#3182CE"
+                  color="white"
+                  maxWidth="180px"
+                >
+                  Ver report
+                </Button>
+              )}
+            </div>
           </div>
 
           <Box>
@@ -202,7 +265,7 @@ const ListExercises = ({
 
               <Box sx={{ display: "flex", gap: "1.5rem" }}>
                 <Button bg="#3182CE" color="white" maxWidth="180px">
-                  Executar verificacao
+                  Verificar plágio
                 </Button>
                 <Button
                   bg="#3182CE"
@@ -268,7 +331,7 @@ const ListExercises = ({
           }}
         >
           <Text fontWeight="bold" color="#313B6D">
-            EXERCICIO FINALIZADO E SEM PENDENCIAS DE CORRECAO!
+            EXERCICIO FINALIZADO E SEM RESPOSTAS!
           </Text>
         </Box>
       );
@@ -320,7 +383,7 @@ const ListExercises = ({
             </div>
             <div
               style={{
-                padding: "10px",
+                padding: "10px 0 10px 0",
                 marginBottom: "10px",
                 width: "100%",
                 height: "auto",
@@ -331,45 +394,63 @@ const ListExercises = ({
                 alignItems: "center",
               }}
             >
-              <div
-                style={{
-                  textAlign: "left",
-                  width: "100%",
-                  background: "#fff",
-                  padding: "15px",
-                }}
-                dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
-              ></div>
-
-              {status && status === "dueLater" && (
+              <div className="flex flex-col items-center justify-center gap-2 p-2 border rounded-md w-full ">
                 <div
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "10px 0",
-                    margin: "10px 0 ",
+                    textAlign: "left",
                     width: "100%",
                     background: "#fff",
+                    padding: "15px",
                   }}
-                >
-                  <input
-                    type="file"
-                    accept=".py, .out, .in"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    bg="#3182CE"
-                    mt={3}
-                    color="white"
-                    onClick={handleUpload}
-                    maxWidth="180px"
+                  dangerouslySetInnerHTML={{ __html: props.exCurrent.html }}
+                />
+              </div>
+
+              {status &&
+                status === "dueLater" &&
+                props.exCurrent.maxAttempts && (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "10px 0",
+                      margin: "10px 0 ",
+                      width: "100%",
+                      background: "#fff",
+                    }}
                   >
-                    Enviar Arquivo
-                  </Button>
-                </div>
-              )}
+                    <div className="flex flex-col items-center justify-center gap-2 p-2 border rounded-md">
+                      <button
+                        className="text-white bg-[#3182CE] px-2 max-w-[180px] py-2 rounded-md font-bold"
+                        onClick={() => {
+                          document.querySelector("#archive")?.click();
+                        }}
+                      >
+                        Selecionar arquivo
+                      </button>
+                      {file ? file.name : "Nenhum arquivo selecionado"}
+                    </div>
+                    <input
+                      id="archive"
+                      className="hidden"
+                      placeholder="Selecione um arquivo"
+                      type="file"
+                      accept=".py, .out, .in"
+                      onChange={handleFileChange}
+                    />
+                    <Button
+                      bg="#3182CE"
+                      mt={3}
+                      color="white"
+                      onClick={handleUpload}
+                      maxWidth="180px"
+                    >
+                      Enviar arquivo
+                    </Button>
+                  </div>
+                )}
             </div>
 
             {props?.outPutEx?.length >= 1 && (
@@ -444,7 +525,7 @@ const ListExercises = ({
 
                 <Box sx={{ display: "flex", gap: "1.5rem" }}>
                   <Button bg="#3182CE" color="white" maxWidth="180px">
-                    Executar verificacao
+                    Verificar plágio
                   </Button>
                   <Button
                     bg="#3182CE"

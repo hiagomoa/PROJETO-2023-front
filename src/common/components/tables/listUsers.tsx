@@ -1,7 +1,7 @@
 import { formatDateTime } from "@/common/utils/formatDateTime";
 import { Box, Button } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { ModalMain } from "../modals/ModalMain";
 
@@ -9,9 +9,12 @@ interface IStudentTable {
   data: {
     name: string;
     ra: string;
-    isOk: string;
+    maxAttempts: string;
     list_inOut: any[];
     exerciseCreated: any;
+    inOuts: any[];
+    exerciseId: string;
+    math: number;
   };
 }
 
@@ -26,7 +29,11 @@ export function StudentTable({ data }: IStudentTable) {
   const columns = [
     {
       name: "Nome",
-      selector: (row) => row.name,
+      selector: (row) => {
+        console.log(row);
+
+        return row.name;
+      },
     },
     {
       name: "RA",
@@ -34,7 +41,16 @@ export function StudentTable({ data }: IStudentTable) {
     },
     {
       name: "Acertos",
-      selector: (row) => row.isOk,
+      selector: (row) => {
+        const filterLengthOK = row.inOuts.filter(
+          (i) => i.studentId === row.student.id && i.answer === "OK"
+        ).length;
+
+        const filterLength = row.inOuts.filter(
+          (i) => i.studentId === row.student.id
+        ).length;
+        return `${filterLengthOK}/${filterLength}`;
+      },
     },
   ];
 
@@ -108,6 +124,9 @@ export function StudentTable({ data }: IStudentTable) {
     closeModal();
   }
 
+  useEffect(() => {
+    console.log(data, "data");
+  }, [data]);
   return (
     <>
       <ModalMain

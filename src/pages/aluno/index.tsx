@@ -152,9 +152,9 @@ const Alunos = () => {
                     <FormMultiSelect
                       {...field}
                       required
-                      placeholder="Turma"
+                      placeholder="Curso"
                       options={[
-                        { id: null, name: "Todas as Turmas" },
+                        { id: null, name: "Todos os Cursos" },
                         ...(classes || []),
                       ]}
                       getOptionValue={(option: any) => option.id}
@@ -177,7 +177,7 @@ const Alunos = () => {
             fontWeight="bold"
             fontSize="3xl"
           >
-            EXERCÍCIOS ATRASADOS
+            EXERCÍCIOS NÃO ENTREGUES
           </Text>
           {dueToday && <ListExercises status="dueToday" data={dueToday} />}
           <Text
@@ -187,7 +187,7 @@ const Alunos = () => {
             fontWeight="bold"
             fontSize="3xl"
           >
-            EXERCÍCIOS CONCLUIDOS
+            EXERCÍCIOS ENTREGUES
           </Text>
           {duePast && <ListExercises status="duePast" data={duePast} />}
         </Container>
