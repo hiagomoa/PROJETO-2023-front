@@ -18,7 +18,6 @@ export const CardExercicios = ({
 
       <Box h="70%" p={5} display="grid" gap={5}>
         <Text>{name}</Text>
-        <Text>{description}</Text>
         <Text>
           <b>Data de entrega:</b> {date}{" "}
         </Text>
