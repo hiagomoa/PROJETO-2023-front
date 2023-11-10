@@ -23,7 +23,7 @@ export const CardExercicios = ({
           <b>Data de entrega:</b> {date}{" "}
         </Text>
         <Text>
-          <b>Curso: </b> {myClass || ""}
+          <b>Turma: </b> {myClass || ""}
         </Text>
         <Text>
           <b>Número máximo de tentativas:</b> {maxAttempts}

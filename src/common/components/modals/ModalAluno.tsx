@@ -134,7 +134,7 @@ const ModalBase = (
                   <FormMultiSelect
                     {...field}
                     required
-                    placeholder="Curso"
+                    placeholder="Turma"
                     options={classes}
                     getOptionValue={(option: any) => option.id}
                     getOptionLabel={(option: any) => option.name}
