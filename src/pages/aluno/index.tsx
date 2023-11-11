@@ -152,9 +152,9 @@ const Alunos = () => {
                     <FormMultiSelect
                       {...field}
                       required
-                      placeholder="Curso"
+                      placeholder="Turma"
                       options={[
-                        { id: null, name: "Todos os Cursos" },
+                        { id: null, name: "Todas as Turmas" },
                         ...(classes || []),
                       ]}
                       getOptionValue={(option: any) => option.id}

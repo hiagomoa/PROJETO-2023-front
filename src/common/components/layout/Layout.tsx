@@ -267,9 +267,9 @@ export const LayoutProfessor = ({ children }) => {
               <Text
                 as="button"
                 fontSize="sm"
-                onClick={() => router.push("/professor/cursos")}
+                onClick={() => router.push("/professor/turmas")}
               >
-                CURSOS
+                TURMAS
               </Text>
               <Text
                 as="button"

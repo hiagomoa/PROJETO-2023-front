@@ -84,9 +84,9 @@ const Professor = () => {
                   <FormMultiSelect
                     {...field}
                     required
-                    placeholder="Curso"
+                    placeholder="Turma"
                     options={[
-                      { id: null, name: "Todos os Curso" }, // Opção para limpar o filtro
+                      { id: null, name: "Todas as Turmas" }, // Opção para limpar o filtro
                       ...(classes || []),
                     ]}
                     getOptionValue={(option: any) => option.id}

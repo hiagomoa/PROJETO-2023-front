@@ -68,7 +68,7 @@ const ModalBase = ({}, ref) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      description: " a",
+      description: "",
     },
   });
 
@@ -209,8 +209,8 @@ const ModalBase = ({}, ref) => {
                     <FormMultiSelect
                       {...field}
                       required
-                      placeholder="Curso"
-                      label="Curso"
+                      placeholder="Turma"
+                      label="Turma"
                       options={classes}
                       getOptionValue={(option: any) => option.id}
                       getOptionLabel={(option: any) => option.name}
