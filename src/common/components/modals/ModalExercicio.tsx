@@ -68,7 +68,7 @@ const ModalBase = ({}, ref) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      description: "",
+      description: "a",
     },
   });
 
