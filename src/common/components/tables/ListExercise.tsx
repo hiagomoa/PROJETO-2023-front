@@ -206,14 +206,6 @@ const ListExercises = ({
           >
             <span> Data de finalização {formatDateTime(date)} </span>
             <div className="flex gap-3">
-              <Button
-                onClick={(e) => handleSimilarity(props.exCurrent[0].exerciseId)}
-                bg="#3182CE"
-                color="white"
-                maxWidth="180px"
-              >
-                Gerar similaridade
-              </Button>
               {props.exCurrent[0].report && (
                 <Button
                   onClick={() => {
@@ -226,6 +218,14 @@ const ListExercises = ({
                   Ver report
                 </Button>
               )}
+              <Button
+                onClick={(e) => handleSimilarity(props.exCurrent[0].exerciseId)}
+                bg="#3182CE"
+                color="white"
+                maxWidth="180px"
+              >
+                Gerar similaridade
+              </Button>
             </div>
           </div>
 
@@ -264,6 +264,19 @@ const ListExercises = ({
               </Text>
 
               <Box sx={{ display: "flex", gap: "1.5rem" }}>
+                {props.exCurrent[0].report && (
+                  <Button
+                    onClick={() => {
+                      router.push(props.exCurrent[0].report);
+                    }}
+                    bg="#3182CE"
+                    color="white"
+                    maxWidth="180px"
+                  >
+                    Ver report
+                  </Button>
+                )}
+
                 <Button bg="#3182CE" color="white" maxWidth="180px">
                   Verificar plágio
                 </Button>
