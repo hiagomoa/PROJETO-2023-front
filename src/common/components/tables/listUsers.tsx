@@ -1,3 +1,4 @@
+"use client";
 import { formatDateTime } from "@/common/utils/formatDateTime";
 import { Box, Button } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
@@ -26,6 +27,7 @@ export function StudentTable({ data }: IStudentTable) {
     setIsOpen(!isOpen);
   }
 
+  console.log(data, "data");
   const columns = [
     {
       name: "Nome",
@@ -42,6 +44,8 @@ export function StudentTable({ data }: IStudentTable) {
     {
       name: "Acertos",
       selector: (row) => {
+        console.log(row.inOuts, "inOuts");
+        console.log(row, "rowwwwww");
         const filterLengthOK = row.inOuts.filter(
           (i) => i.studentId === row.student.id && i.answer === "OK"
         ).length;
@@ -49,6 +53,7 @@ export function StudentTable({ data }: IStudentTable) {
         const filterLength = row.inOuts.filter(
           (i) => i.studentId === row.student.id
         ).length;
+
         return `${filterLengthOK}/${filterLength}`;
       },
     },
