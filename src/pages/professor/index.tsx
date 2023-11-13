@@ -9,7 +9,7 @@ import { API_HOST } from "@/common/utils/config";
 import { AuthContext } from "@/context/auth.context";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useQuery } from "react-query";
 import * as yup from "yup";
@@ -52,10 +52,6 @@ const Professor = () => {
     ],
     listExercises
   );
-
-  useEffect(() => {
-    console.log(exercise, "eeeeeeeeeeeeeee");
-  }, [exercise]);
 
   const handleSelect = async (id: string) => {
     await fetch(`${API_HOST}/exercise/${id}`, {

@@ -39,7 +39,6 @@ const ListExercises = ({
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data, "in outs");
         setInOuts(data?.data?.inOuts);
       });
   }
@@ -68,7 +67,6 @@ const ListExercises = ({
           exerciseId: exercise.id,
         })
         .then((r) => {
-          console.log(exercise, "exercise.ex");
           setProps({
             ...props,
             exCurrent: {
@@ -108,7 +106,6 @@ const ListExercises = ({
         .get(`${API_HOST}/exercise/get-users-by-exc/${exercise.id}`)
         .then((item: any) => {
           if (item.data.data.length >= 1) {
-            console.log(item.data.data, "item.data.data");
             const r = item.data.data.map((i: any) => {
               return {
                 student: i.student,
@@ -126,7 +123,6 @@ const ListExercises = ({
                 url: i.answer,
               };
             });
-            console.log(r);
             setProps({ ...props, exCurrent: r });
           } else {
             setProps({ ...props, exCurrent: null });
@@ -170,7 +166,6 @@ const ListExercises = ({
 
   function MyModal() {
     const handleSimilarity = async (id: string) => {
-      await console.log(id, "id");
       await fetch(`${process.env.API_SIMILARITY}/moss`, {
         body: JSON.stringify({ idExercise: id }),
         method: "POST",
@@ -240,10 +235,6 @@ const ListExercises = ({
       new Date(props.exCurrent[0].endDate.split(":00.")[0]) > new Date()
     ) {
       const date = new Date(props.exCurrent[0].endDate);
-      console.log(
-        "props.exCurrent.exerciseName",
-        props.exCurrent[0].exerciseName
-      );
 
       const title = props.exCurrent[0].exerciseName;
 
