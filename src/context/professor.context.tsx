@@ -6,6 +6,8 @@ export interface IProfessorContext {
   updateExercise: () => Promise<void>;
   editExerciseDescription: string;
   setEditExerciseDescription: (description: string) => void;
+  editTitleExercise: string;
+  setEditTitleExercise: (title: string) => void;
   editHtmlExercise: string;
   setEditHtmlExercise: (html: string) => void;
   editDateExercise: string | undefined;
@@ -54,7 +56,7 @@ export const ProfessorProvider = ({ children }: any) => {
       created_at: selectedExercise.created_at,
       deleted_at: selectedExercise.deleted_at,
       id: selectedExercise.id,
-      name: selectedExercise.name,
+      name: editTitleExercise,
       professorId: selectedExercise.professorId,
       updated_at: new Date().toISOString(),
       description: editExerciseDescription,
@@ -100,10 +102,13 @@ export const ProfessorProvider = ({ children }: any) => {
     string | undefined
   >();
   const [editMaxAttempts, setEditMaxAttempts] = useState<number | undefined>();
+  const [editTitleExercise, setEditTitleExercise] = useState<string>("");
 
   return (
     <ProfessorContext.Provider
       value={{
+        setEditTitleExercise,
+        editTitleExercise,
         selectedExercise,
         handleSelectExercise,
         updateExercise,

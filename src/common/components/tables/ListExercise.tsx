@@ -33,27 +33,22 @@ const ListExercises = ({
   const [props, setProps] = useState<IProps>();
   const [inOuts, setInOuts] = useState<any[]>([]);
 
-  useEffect(() => {
-    console.log(inOuts);
-  }, [inOuts]);
-
   async function getInOuts(id: string) {
     await fetch(`${API_HOST}/inOuts/${id}`, {
       method: "GET",
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        // setInOuts(data?.data?.inOuts);
+        console.log(data, "in outs");
+        setInOuts(data?.data?.inOuts);
       });
   }
+
   const router = useRouter();
 
   const {
     handleSelectExercise,
     selectedExercise,
-    editExerciseDescription,
-    setEditExerciseDescription,
     editDateExercise,
     editHtmlExercise,
     editMaxAttempts,
@@ -67,18 +62,20 @@ const ListExercises = ({
     setIsOpen(!isOpen);
     if (exercise && scope == "student") {
       // @ts-ignore
-      axios
+      await axios
         .post(`${API_HOST}/answer/out-put`, {
           studentId: user?.id,
           exerciseId: exercise.id,
         })
         .then((r) => {
+          console.log(exercise, "exercise.ex");
           setProps({
             ...props,
             exCurrent: {
               html: exercise.html,
               title: exercise.name,
               expectedDate: new Date(exercise.dueDate),
+              inOuts: exercise.inOuts,
               maxAttempts: exercise.maxAttempts,
               id: exercise.id,
               attempts: r.data.attempts || 0,
@@ -93,6 +90,7 @@ const ListExercises = ({
               html: exercise.html,
               title: exercise.name,
               expectedDate: new Date(exercise.dueDate),
+              inOuts: exercise.inOuts,
               attempts: 0,
               maxAttempts: exercise.maxAttempts,
               id: exercise.id,
@@ -101,14 +99,16 @@ const ListExercises = ({
           });
         });
     } else if (exercise) {
-      await axios.get(`${API_HOST}/inOuts/${exercise.id}`).then((item) => {
-        setInOuts(item.data);
-        console.log(inOuts[0], "inOuts");
-      });
+      const inO = await axios
+        .get(`${API_HOST}/inOuts/${exercise.id}`)
+        .then((item) => {
+          return item.data;
+        });
       await axios
         .get(`${API_HOST}/exercise/get-users-by-exc/${exercise.id}`)
         .then((item: any) => {
           if (item.data.data.length >= 1) {
+            console.log(item.data.data, "item.data.data");
             const r = item.data.data.map((i: any) => {
               return {
                 student: i.student,
@@ -117,9 +117,8 @@ const ListExercises = ({
                 report: exercise.report,
                 exerciseId: exercise.id,
                 endDate: exercise.dueDate,
-                inOuts: inOuts,
-                math: inOuts.filter((ii) => ii.exerciseId === exercise.id)
-                  .length,
+                inOuts: inO,
+                math: inO.filter((ii) => ii.exerciseId === exercise.id).length,
                 list_inOut: i.list_inOut,
                 maxAttempts: exercise.maxAttempts,
                 exerciseCreated: exercise.created_at,
@@ -127,6 +126,7 @@ const ListExercises = ({
                 url: i.answer,
               };
             });
+            console.log(r);
             setProps({ ...props, exCurrent: r });
           } else {
             setProps({ ...props, exCurrent: null });
@@ -207,16 +207,16 @@ const ListExercises = ({
             <span> Data de finalização {formatDateTime(date)} </span>
             <div className="flex gap-3">
               {props.exCurrent[0].report && (
-                <Button
-                  onClick={() => {
-                    router.push(props.exCurrent[0].report);
-                  }}
-                  bg="#3182CE"
-                  color="white"
-                  maxWidth="180px"
+                <a
+                  href={props.exCurrent[0].report}
+                  target="__blank"
+
+                  // bg="#3182CE"
+                  // color="white"
+                  // maxWidth="180px"
                 >
                   Ver report
-                </Button>
+                </a>
               )}
               <Button
                 onClick={(e) => handleSimilarity(props.exCurrent[0].exerciseId)}
@@ -240,6 +240,12 @@ const ListExercises = ({
       new Date(props.exCurrent[0].endDate.split(":00.")[0]) > new Date()
     ) {
       const date = new Date(props.exCurrent[0].endDate);
+      console.log(
+        "props.exCurrent.exerciseName",
+        props.exCurrent[0].exerciseName
+      );
+
+      const title = props.exCurrent[0].exerciseName;
 
       return (
         <>
@@ -265,16 +271,17 @@ const ListExercises = ({
 
               <Box sx={{ display: "flex", gap: "1.5rem" }}>
                 {props.exCurrent[0].report && (
-                  <Button
-                    onClick={() => {
-                      router.push(props.exCurrent[0].report);
-                    }}
-                    bg="#3182CE"
-                    color="white"
-                    maxWidth="180px"
+                  <a
+                    className="flex items-center justify-center px-4 rounded-md font-bold text-white py-2 bg-[#3182ce]"
+                    href={props.exCurrent[0].report}
+                    target="_blank"
+
+                    // bg="#3182CE"
+                    // color="white"
+                    // maxWidth="180px"
                   >
                     Ver report
-                  </Button>
+                  </a>
                 )}
 
                 <Button bg="#3182CE" color="white" maxWidth="180px">
@@ -310,11 +317,7 @@ const ListExercises = ({
                 maxW="17rem"
               />
             </Box>
-            <Input
-              value={editExerciseDescription}
-              onChange={(e) => setEditExerciseDescription(e.target.value)}
-              placeholder="Assunto"
-            />
+
             <Box h="30rem" boxSizing="border-box">
               <FormEditorHtml
                 value={editHtmlExercise}
@@ -325,7 +328,7 @@ const ListExercises = ({
           <Text fontWeight="bold" color="#313B6D" mb="1.5rem">
             Alunos que realizaram
           </Text>
-          <StudentTable data={props.exCurrent} />
+          <StudentTable data={props?.exCurrent} />
         </>
       );
     } else if (
@@ -570,11 +573,7 @@ const ListExercises = ({
                   maxW="17rem"
                 />
               </Box>
-              <Input
-                value={editExerciseDescription}
-                onChange={(e) => setEditExerciseDescription(e.target.value)}
-                placeholder="Assunto"
-              />
+
               <Box h="30rem" boxSizing="border-box">
                 <FormEditorHtml
                   value={editHtmlExercise}
@@ -615,8 +614,9 @@ const ListExercises = ({
             data?.map((exercise: Exercise, key: number) => (
               <GridItem
                 key={key}
-                onClick={() => {
-                  handleSelectExercise(exercise), updateModal(exercise);
+                onClick={async () => {
+                  handleSelectExercise(exercise);
+                  updateModal(exercise);
                 }}
                 style={{ cursor: "pointer" }}
               >
