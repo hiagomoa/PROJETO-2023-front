@@ -2,7 +2,7 @@
 import { formatDateTime } from "@/common/utils/formatDateTime";
 import { Box, Button } from "@chakra-ui/react";
 import { CheckCircle, WarningCircle, XCircle } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DataTable from "react-data-table-component";
 import { ModalMain } from "../modals/ModalMain";
 
@@ -27,13 +27,10 @@ export function StudentTable({ data }: IStudentTable) {
     setIsOpen(!isOpen);
   }
 
-  console.log(data, "data");
   const columns = [
     {
       name: "Nome",
       selector: (row) => {
-        console.log(row);
-
         return row.name;
       },
     },
@@ -44,8 +41,6 @@ export function StudentTable({ data }: IStudentTable) {
     {
       name: "Acertos",
       selector: (row) => {
-        console.log(row.inOuts, "inOuts");
-        console.log(row, "rowwwwww");
         const filterLengthOK = row.inOuts.filter(
           (i) => i.studentId === row.student.id && i.answer === "OK"
         ).length;
@@ -129,9 +124,6 @@ export function StudentTable({ data }: IStudentTable) {
     closeModal();
   }
 
-  useEffect(() => {
-    console.log(data, "data");
-  }, [data]);
   return (
     <>
       <ModalMain
